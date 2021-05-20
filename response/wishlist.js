@@ -9,13 +9,19 @@ async function getAllWishlist(row) {
     response.wishlist_id = row.WISHLIST_ID;
     response.symbol = symbol;
 
-    const details = await nseIndia.getEquityDetails(symbol);
+    try {
+        const details = await nseIndia.getEquityDetails(symbol);
+        console.log("data from nse : " + JSON.stringify(details));
+        
+        response.change = details.priceInfo.change.toFixed(2);
+        response.percent_change = details.priceInfo.pChange.toFixed(2);
+        response.current_price = details.priceInfo.lastPrice;
+    } catch(err){
+        console.log(err);
+        throw err;
+    }
+ 
 
-    console.log("data from nse : " + JSON.stringify(details));
-
-    response.change = details.priceInfo.change.toFixed(2);
-    response.percent_change = details.priceInfo.pChange.toFixed(2);
-    response.current_price = details.priceInfo.lastPrice;
 
     return response;
 }
@@ -24,7 +30,7 @@ async function getWishlist(row) {
     var response = {};
     const symbol = row.SYMBOL;
 
-    const details = await nseIndia.getEquityDetails(symbol)
+    const details = await nseIndia.getEquityDetails(symbol);
 
     response.wishlist_id = row.WISHLIST_ID;
     response.symbol = symbol;
