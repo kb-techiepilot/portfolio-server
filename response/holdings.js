@@ -10,7 +10,7 @@ async function getHoldings(row) {
     const quantity = row.QUANTITY;
     const purchaseDate = row.DATE;
 
-    const details = await nseIndia.getEquityDetails(symbol)
+    const details = await nseIndia.getEquityDetails(symbol);
 
     // let history = await nseIndia.getEquityHistoricalData(symbol, {start:"2021-05-20", end:"2021-05-21"});
     // console.log(JSON.stringify(history));

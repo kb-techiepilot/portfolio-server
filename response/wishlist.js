@@ -9,7 +9,7 @@ async function getAllWishlist(row) {
     response.wishlist_id = row.WISHLIST_ID;
     response.symbol = symbol;
 
-    const details = await nseIndia.getEquityDetails(symbol)
+    const details = await nseIndia.getEquityDetails(symbol);
 
     console.log("data from nse : " + JSON.stringify(details));
 
