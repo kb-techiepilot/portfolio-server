@@ -44,8 +44,8 @@ const checkJwt = jwt({
 
 // Routes
 app.use("/", indexRoute);
-app.use("/wishlist", wishlist);
-app.use("/holdings", holdings);
+app.use("/wishlist", checkJwt, wishlist);
+app.use("/holdings", checkJwt, holdings);
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}!!!`);
