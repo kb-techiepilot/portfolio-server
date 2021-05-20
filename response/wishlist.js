@@ -11,6 +11,8 @@ async function getAllWishlist(row) {
 
     const details = await nseIndia.getEquityDetails(symbol)
 
+    console.log("data from nse : " + JSON.stringify(details));
+
     response.change = details.priceInfo.change.toFixed(2);
     response.percent_change = details.priceInfo.pChange.toFixed(2);
     response.current_price = details.priceInfo.lastPrice;
