@@ -17,7 +17,6 @@ const app = express();
 //getting all wishlist
 router.get('/', async (req, res) => {
     const userObj = await user.getUserFromDb(req.user.sub, req.headers.authorization);
-    console.log("user from db : " + JSON.stringify(userObj));
     pool.query(
         sql.wishlist.getAll, [userObj.USER_ID],
         (err, wishlist) => {
@@ -30,7 +29,6 @@ router.get('/', async (req, res) => {
                 var responseList= [];
                 wishlist.rows.forEach((row, index) => {
                     
-                    console.log("data from db : " + JSON.stringify(row));
                     Promise.resolve(wishlistResponse.getAllWishlist(row))
                     .then((response => {
                         responseList.push(response);

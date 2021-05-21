@@ -20,7 +20,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-const port = "7001";
 const appOrigin = "http://localhost:3000";
 const audience = "https://techiepilot.in";
 const issuer = "https://dev-604foaig.us.auth0.com/";
@@ -33,7 +32,6 @@ app.use(
 app.use(bodyParser.json());
 
 app.use(helmet());
-app.use(cors({ origin: appOrigin }));
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
