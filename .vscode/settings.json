@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.deploySubpath": ".",
+    "appService.defaultWebAppToDeploy": "/subscriptions/35f1eb3e-7d8f-4d93-8e8f-8a4a99e0ba9d/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/kb-shares"
+}
