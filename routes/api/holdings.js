@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { NseIndia } = require("stock-nse-india");
 
 const pool = require("../../db/db");
 const keys = require("../../config/keys");
@@ -9,6 +10,8 @@ const user = require("../../user");
 const stock = require("../../stock");
 
 const holdingsResponse = require("../../response/holdings");
+
+const nseIndia = new NseIndia()
 
 const app = express();
 
@@ -71,27 +74,34 @@ router.post('/', async (req, res) => {
     const userObj = await user.getUserFromDb(req.user.sub, req.headers.authorization);
 
     const {date, symbol, quantity, price } = req.body;
-    pool.query(
-        sql.holdings.getBySymbol, [ symbol, userObj.USER_ID ],
-        (err, holdings) => {
-            if(err) {
-                throw err;
-            }
-            if(holdings.rows.length > 0) {
-                return res.status(200).json({"message" : "Stock already added to the holdings"});
-            } else {
-                pool.query(
-                    sql.holdings.insert, [ userObj.USER_ID, date, symbol, quantity, price ],
-                    (err, holdings) => {
-                        if(err){
-                            throw err;
+
+    const details = await nseIndia.getEquityDetails(symbol);
+    
+    if(details.msg === "no data found") {
+        res.status(200).json({"message" : "Enter valid symbol"});
+    } else {
+            pool.query(
+            sql.holdings.getBySymbol, [ symbol, userObj.USER_ID ],
+            (err, holdings) => {
+                if(err) {
+                    throw err;
+                }
+                if(holdings.rows.length > 0) {
+                    return res.status(200).json({"message" : "Stock already added to the holdings"});
+                } else {
+                    pool.query(
+                        sql.holdings.insert, [ userObj.USER_ID, date, symbol, quantity, price ],
+                        (err, holdings) => {
+                            if(err){
+                                throw err;
+                            }
+                            res.json(holdings.rows[0]);
                         }
-                        res.json(holdings.rows[0]);
-                    }
-                );
+                    );
+                }
             }
-        }
-    );
+        );
+    }
 });
 
 //updating holdings

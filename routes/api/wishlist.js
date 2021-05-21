@@ -74,27 +74,31 @@ router.post('/', async (req, res) => {
     const { symbol } = req.body;
 
     const details = await nseIndia.getEquityDetails(symbol)
-    pool.query(
-        sql.wishlist.getBySymbol, [ symbol, userObj.USER_ID],
-        (err, wishlist) => {
-            if(err) {
-                throw err;
-            }
-            if(wishlist.rows.length > 0) {
-                return res.status(200).json({"message" : "Stock already added to the wishlist"});
-            } else {
-                pool.query(
-                    sql.wishlist.insert, [userObj.USER_ID, symbol, details.priceInfo.lastPrice ],
-                    (err, wishlist) => {
-                        if(err){
-                            throw err;
+    if(details.msg === "no data found") {
+        res.status(200).json({"message" : "Enter valid symbol"});
+    } else {
+        pool.query(
+            sql.wishlist.getBySymbol, [ symbol, userObj.USER_ID],
+            (err, wishlist) => {
+                if(err) {
+                    throw err;
+                }
+                if(wishlist.rows.length > 0) {
+                    return res.status(200).json({"message" : "Stock already added to the wishlist"});
+                } else {
+                    pool.query(
+                        sql.wishlist.insert, [userObj.USER_ID, symbol, details.priceInfo.lastPrice ],
+                        (err, wishlist) => {
+                            if(err){
+                                throw err;
+                            }
+                            res.json(wishlist.rows[0]);
                         }
-                        res.json(wishlist.rows[0]);
-                    }
-                );
+                    );
+                }
             }
-        }
-    );
+        );
+    }
 });
 
 //deleting a wishlist
