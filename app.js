@@ -11,8 +11,8 @@ const jwt = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
 
 const indexRoute = require("./routes/index");
-const wishlist = require("./routes/api/wishlist");
-const holdings = require("./routes/api/holdings");
+const wishlist = require("./routes/api/wishlist/v1");
+const holdings = require("./routes/api/holdings/v1");
 
 var app = express();
 
@@ -54,8 +54,8 @@ const checkJwt = jwt({
 
 // Routes
 app.use("/", indexRoute);
-app.use("/wishlist", checkJwt, wishlist);
-app.use("/holdings", checkJwt, holdings);
+app.use("api/v1/wishlist", checkJwt, wishlist);
+app.use("api/v1/holdings", checkJwt, holdings);
 
 // error handler
 app.use(function(err, req, res, next) {

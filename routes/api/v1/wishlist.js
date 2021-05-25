@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { NseIndia } = require("stock-nse-india");
 
-const pool = require("../../db/db");
-const keys = require("../../config/keys");
-const sql  = require("../../config/sql");
-const user = require("../../user");
-const stock = require("../../stock");
+const pool = require("../../../db/db");
+const keys = require("../../../config/keys");
+const sql  = require("../../../config/sql");
+const user = require("../../../user");
+const stock = require("../../../stock");
 
-const wishlistResponse = require("../../response/wishlist");
+const wishlistResponse = require("../../../response/wishlist");
 
 const nseIndia = new NseIndia()
 
