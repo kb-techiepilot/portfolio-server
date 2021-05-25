@@ -8,7 +8,7 @@ async function getHoldings(row) {
     const symbol = row.SYMBOL;
     const price = row.PRICE;
     const quantity = row.QUANTITY;
-    const purchaseDate = row.DATE;
+    const purchaseDate = row.PURCHASED_DATE;
 
     const details = await nseIndia.getEquityDetails(symbol);
 
