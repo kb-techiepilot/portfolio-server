@@ -8,13 +8,25 @@ const Pool = require("pg").Pool;
 //     port: "5432"
 // });
 
+//heroku configuration
+// const pool = new Pool({
+//     user: "ecdklsjcttltdj",
+//     password: "e16ee3a923992919539ebefb45eca306e954957ce803f05dba64b1691d6c53a7",
+//     database: "d8lnlcpqhio1si",
+//     host: "ec2-54-152-185-191.compute-1.amazonaws.com",
+//     port: "5432",
+//     ssl: { rejectUnauthorized: false }
+// });
+
 const pool = new Pool({
-    user: "ecdklsjcttltdj",
-    password: "e16ee3a923992919539ebefb45eca306e954957ce803f05dba64b1691d6c53a7",
-    database: "d8lnlcpqhio1si",
-    host: "ec2-54-152-185-191.compute-1.amazonaws.com",
+    user: "portfolio@kb-shares",
+    password: "Root@123",
+    database: "postgres",
+    host: "kb-shares.postgres.database.azure.com",
     port: "5432",
-    ssl: { rejectUnauthorized: false }
+    ssl: true
 });
 
 module.exports = pool;
+
+// postgres://portfolio%40kb-shares:Root%40123@kb-shares.postgres.database.azure.com:5432/postgres
