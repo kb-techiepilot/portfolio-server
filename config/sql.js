@@ -3,6 +3,10 @@ module.exports = {
         getUserBySub    : `SELECT "USER_ID", "NAME", TO_CHAR("CREATED_ON" :: DATE, 'dd-mm-yyyy') AS "CREATED_ON" FROM userinfo WHERE "SUB" = $1`,
         insert          : `INSERT INTO userinfo ("NAME", "SUB", "CREATED_ON") VALUES ($1, $2, NOW()) RETURNING "USER_ID", "CREATED_ON"`
     },
+    dashboard: {
+        getSummary      : `SELECT "SYMBOL", "PRICE", "QUANTITY" FROM holdings WHERE "USER_ID" = $1`,
+        getPercentage   : `SELECT "SYMBOL", ROUND(((SUM( "PRICE" * "QUANTITY") / (SELECT SUM("PRICE" * "QUANTITY") FROM HOLDINGS WHERE "USER_ID" = $1)) * 100), 2) AS "HOLDING_PERCENTAGE" FROM holdings WHERE "USER_ID" = $1 GROUP BY "SYMBOL", "HOLDINGS_ID" ORDER BY "HOLDINGS_ID"`
+    },
     wishlist: {
         getAll      : `SELECT "WISHLIST_ID", TO_CHAR("DATE" :: DATE, 'dd-mm-yyyy') AS "ADDED_DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "USER_ID" = $1 ORDER BY "DATE" ASC`,
         getById     : `SELECT "WISHLIST_ID", TO_CHAR("DATE" :: DATE, 'dd-mm-yyyy') AS "DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "WISHLIST_ID" = $1 AND "USER_ID" = $2`,

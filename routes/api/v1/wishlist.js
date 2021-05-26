@@ -3,16 +3,13 @@ const router = express.Router();
 const { NseIndia } = require("stock-nse-india");
 
 const pool = require("../../../db/db");
-const keys = require("../../../config/keys");
 const sql  = require("../../../config/sql");
 const user = require("../../../user");
-const stock = require("../../../stock");
+// const stock = require("../../../stock");
 
 const wishlistResponse = require("../../../response/wishlist");
 
 const nseIndia = new NseIndia()
-
-const app = express();
 
 //getting all wishlist
 router.get('/', async (req, res) => {
@@ -32,7 +29,7 @@ router.get('/', async (req, res) => {
                     Promise.resolve(wishlistResponse.getAllWishlist(row))
                     .then((response => {
                         responseList.push(response);
-                        if(index == wishlist.rows.length - 1){
+                        if(responseList.length == wishlist.rows.length){
                             res.json(responseList);
                         }
                     }));

@@ -3,7 +3,6 @@ const router = express.Router();
 const { NseIndia } = require("stock-nse-india");
 
 const pool = require("../../../db/db");
-const keys = require("../../../config/keys");
 const sql  = require("../../../config/sql");
 
 const user = require("../../../user");
@@ -11,8 +10,6 @@ const user = require("../../../user");
 const holdingsResponse = require("../../../response/holdings");
 
 const nseIndia = new NseIndia()
-
-const app = express();
 
 //getting all holdings
 router.get('/', async (req, res) => {
@@ -33,7 +30,10 @@ router.get('/', async (req, res) => {
                     Promise.resolve(holdingsResponse.getHoldings(row))
                     .then((response => {
                         responseList.push(response);
-                        if(index == holdings.rows.length - 1){
+                        if(responseList.length == holdings.rows.length){
+                            responseList.sort((a,b) => {
+                                return a.holdings_id - b.holdings_id;
+                            })
                             res.json(responseList);
                         }
                     }));
