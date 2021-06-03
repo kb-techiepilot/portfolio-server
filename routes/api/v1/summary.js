@@ -63,7 +63,8 @@ router.get('/chart', async (req, res) => {
                 throw err;
             }
             if(summary.rows.length === 0) {
-                return res.status(200).json({"message" : "Not started investing"});
+                var responseList = []
+                return res.status(200).json(responseList);
             } else {
                 var responseList = [];
                 var result = {};
