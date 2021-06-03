@@ -21,7 +21,12 @@ router.get('/', async (req, res) => {
                 throw err;
             }
             if(summary.rows.length === 0) {
-                return res.status(200).json({"message" : "Not started investing"});
+                var result = {}
+                result.total_amount = 0;
+                result.current_amount = 0;
+                result.difference = 0;
+                result.percentage = 0;
+                return res.status(200).json(result);
             } else {
                 var totalAmount = 0;
                 var currentAmount = 0;
