@@ -14,6 +14,7 @@ const indexRoute = require("./routes/index");
 const wishlist = require("./routes/api/v1/wishlist");
 const holdings = require("./routes/api/v1/holdings");
 const summary = require("./routes/api/v1/summary");
+const history = require("./routes/api/v1/history");
 
 var app = express();
 
@@ -21,7 +22,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-const appOrigin = "http://localhost:3000";
 const audience = "https://techiepilot.in";
 const issuer = "https://dev-604foaig.us.auth0.com/";
 
@@ -58,6 +58,7 @@ app.use("/", indexRoute);
 app.use("/api/v1/wishlist", checkJwt, wishlist);
 app.use("/api/v1/holdings", checkJwt, holdings);
 app.use("/api/v1/summary", checkJwt, summary);
+app.use("/api/v1/history", checkJwt, history);
 
 // error handler
 app.use(function(err, req, res, next) {
