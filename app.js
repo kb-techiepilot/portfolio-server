@@ -15,6 +15,7 @@ const wishlist = require("./routes/api/v1/wishlist");
 const holdings = require("./routes/api/v1/holdings");
 const summary = require("./routes/api/v1/summary");
 const history = require("./routes/api/v1/history");
+const symbols = require("./routes/api/v1/symbols");
 
 var app = express();
 
@@ -59,6 +60,7 @@ app.use("/api/v1/wishlist", checkJwt, wishlist);
 app.use("/api/v1/holdings", checkJwt, holdings);
 app.use("/api/v1/summary", checkJwt, summary);
 app.use("/api/v1/history", checkJwt, history);
+app.use("/api/v1/symbols", checkJwt, symbols);
 
 // error handler
 app.use(function(err, req, res, next) {
