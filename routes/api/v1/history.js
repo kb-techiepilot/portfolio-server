@@ -5,7 +5,6 @@ const { NseIndia } = require("stock-nse-india");
 const nseIndia = new NseIndia()
 
 async function getHistoryData(symbol, startDate, endDate) {
-    console.log(symbol);
     let history = await nseIndia.getEquityHistoricalData(symbol, {start:startDate, end:endDate});
     return history;
 }

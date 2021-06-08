@@ -59,8 +59,8 @@ app.use("/", indexRoute);
 app.use("/api/v1/wishlist", checkJwt, wishlist);
 app.use("/api/v1/holdings", checkJwt, holdings);
 app.use("/api/v1/summary", checkJwt, summary);
-app.use("/api/v1/history", checkJwt, history);
-app.use("/api/v1/symbols", checkJwt, symbols);
+app.use("/api/v1/history", history);
+app.use("/api/v1/symbols", symbols);
 
 // error handler
 app.use(function(err, req, res, next) {
