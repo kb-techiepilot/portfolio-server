@@ -18,6 +18,8 @@ const history = require("./routes/api/v1/history");
 const symbols = require("./routes/api/v1/symbols");
 const news = require("./routes/api/v1/news");
 
+const wishlistV2 = require("./routes/api/v2/wishlist");
+
 var app = express();
 
 // view engine setup
@@ -63,6 +65,10 @@ app.use("/api/v1/summary", checkJwt, summary);
 app.use("/api/v1/history", history);
 app.use("/api/v1/symbols", symbols);
 app.use("/api/v1/news", news);
+
+//version2 apis
+app.use("/api/v2/wishlist", checkJwt, wishlistV2);
+
 
 // error handler
 app.use(function(err, req, res, next) {

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { NseIndia } = require("stock-nse-india");
+const { NseIndia, ApiList } = require("stock-nse-india");
 
 const nseIndia = new NseIndia()
 
@@ -29,6 +29,13 @@ router.get('/intraday', async (req, res) => {
 router.get('/current', async (req, res) => {
     const symbolData = await nseIndia.getEquityDetails(req.query.symbol);
     res.json(symbolData);
+});
+
+router.get('/data', async (req, res) => {
+    const url = ApiList[req.query.symbol];
+    const response = await nseIndia.getEquityCorporateInfo("SBIN");
+    console.log(response);
+    res.json(response);
 });
 
 module.exports = router;
