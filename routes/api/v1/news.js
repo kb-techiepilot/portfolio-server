@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         from: startDate,
         to: endDate,
         language: 'en',
-        pageSize: 2
+        pageSize: 10
       }).then(response => {
         res.json(response);
       });
