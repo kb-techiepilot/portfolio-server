@@ -32,7 +32,11 @@ router.get('/:symbol', async (req, res) => {
         });
     });
     historyData = historyData.sort(GetSortOrder());
-    res.json(historyData);
+    var currentData = await nseIndia.getEquityDetails(symbol);
+    var responseData = {};
+    responseData.history = historyData;
+    responseData.current = currentData;
+    res.json(responseData);
 });
 
 module.exports = router;
