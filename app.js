@@ -19,6 +19,9 @@ const symbols = require("./routes/api/v1/symbols");
 const news = require("./routes/api/v1/news");
 
 const wishlistV2 = require("./routes/api/v2/wishlist");
+const holdingsV2 = require("./routes/api/v2/holdings");
+const transactionsV2 = require("./routes/api/v2/transactions");
+const soldV2 = require("./routes/api/v2/sold");
 
 var app = express();
 
@@ -68,6 +71,9 @@ app.use("/api/v1/news", news);
 
 //version2 apis
 app.use("/api/v2/wishlist", checkJwt, wishlistV2);
+app.use("/api/v2/holdings", checkJwt, holdingsV2);
+app.use("/api/v2/transactions", checkJwt, transactionsV2);
+app.use("/api/v2/sold", checkJwt, soldV2);
 
 
 // error handler

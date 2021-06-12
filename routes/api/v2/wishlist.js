@@ -14,7 +14,7 @@ const nseIndia = new NseIndia();
 //getting all wishlist
 router.get('/', async (req, res) => {
     const { workspace } = req.query;
-    var userObj = await user.getUserWithWorkspace(req.user.sub, workspace, req.headers.authorization);
+    var userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
     }
@@ -49,7 +49,7 @@ router.get('/:id', async (req, res) => {
 
     const { workspace } = req.query;
 
-    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, req.headers.authorization);
+    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
 
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
@@ -77,7 +77,7 @@ router.get('/:id', async (req, res) => {
 //adding wishlist
 router.post('/', async (req, res) => {
     const { symbol, workspace } = req.query;
-    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, req.headers.authorization);
+    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
 
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
@@ -114,7 +114,7 @@ router.post('/', async (req, res) => {
 //buld insert
 router.post('/bulk', async (req, res) => {
     const { symbols, workspace } = req.query;
-    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, req.headers.authorization);
+    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
     var response = [];
 
     if(userObj === null) {
@@ -162,7 +162,7 @@ router.delete('/:id', async (req, res) => {
 
     const { workspace } = req.query;
 
-    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, req.headers.authorization);
+    const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
 
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});

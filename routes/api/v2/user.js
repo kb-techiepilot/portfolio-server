@@ -52,11 +52,11 @@ async function getUserFromDb(sub, token) {
     }
   }
 
-  async function getUserWithWorkspace(sub, workspace, token) {
+  async function getUserWithWorkspace(sub, workspace, workspaceType, token) {
     const userData = await getUserFromDb(sub, token);
       try {
         var user = await pool.query(
-          sql.users.getUserWorkspace, [userData.USER_ID, workspace]
+          sql.users.getUserWorkspace, [userData.USER_ID, workspace, workspaceType]
         );
         if(user.rows.length === 0) {
           return null;
