@@ -223,7 +223,7 @@ router.post('/:id', async (req, res) => {
             newQuantity = Number(quantity) + Number(oldQuantity);
             newPrice = (oldAmount + newAmount)/newQuantity;
 
-            await util.addTransactions(userObj.USER_ID, 'Buy', symbol, quantity, price);
+            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, data.SYMBOL, quantity, price);
         } 
         //need to update the transaction table also
         pool.query(
