@@ -75,6 +75,9 @@ app.use("/api/v2/wishlist", checkJwt, wishlistV2);
 app.use("/api/v2/holdings", checkJwt, holdingsV2);
 app.use("/api/v2/transactions", checkJwt, transactionsV2);
 app.use("/api/v2/sold", checkJwt, soldV2);
+app.use("/api/v2/history", history);
+app.use("/api/v2/symbols", symbols);
+app.use("/api/v2/news", news);
 
 app.use("/api/v2/summary", checkJwt, summaryV2);
 

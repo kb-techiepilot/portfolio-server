@@ -54,7 +54,7 @@ router.post('/:id', async (req, res) => {
 
     let id = req.params.id;
 
-    var { partial, price, quantity } = req.query;
+    var { partial, price, quantity, solddate } = req.query;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, 'default', 'holdings', req.headers.authorization);
 
@@ -65,7 +65,12 @@ router.post('/:id', async (req, res) => {
             if(holdingsData.QUANTITY < quantity ) {
                 res.json({"message" : "Insufficient quantity in funds"});
             } else {
-                await util.updateHoldings(Number(holdingsData.QUANTITY) - quantity, holdingsData.HOLDINGS_ID);
+                const newQuantity = Number(holdingsData.QUANTITY) - quantity;
+                if(newQuantity > 0) {
+                    await util.updateHoldings(newQuantity, holdingsData.HOLDINGS_ID);
+                } else {
+                    await util.deleteHoldings(userObj.USER_ID, userObj.WORKSPACE_ID, id);
+                }
             }
         } else {
             quantity = holdingsData.QUANTITY;
@@ -73,9 +78,9 @@ router.post('/:id', async (req, res) => {
         }
 
         try{
-            const response = await util.addSoldEntry(userObj.USER_ID, holdingsData.SYMBOL, quantity, holdingsData.PRICE, price);
+            const response = await util.addSoldEntry(userObj.USER_ID, new Date(holdingsData.DATE).getTime() / 1000, new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, holdingsData.PRICE, price);
             try{
-                await util.addTransactions(userObj.USER_ID, 'Sell', holdingsData.SYMBOL, quantity, price);
+                await util.addTransactions(userObj.USER_ID, 'Sell', new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, price);
             } catch(err) {
                 res.status(200).json({"message" : "Exception on selling holdings : " + err})
             }

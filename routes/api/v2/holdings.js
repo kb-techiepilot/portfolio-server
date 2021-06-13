@@ -109,13 +109,13 @@ router.post('/', async (req, res) => {
         }else {
             pool.query(
                 sql.holdings.insert, [ userObj.USER_ID, userObj.WORKSPACE_ID, new Date(date).getTime() / 1000
-                , symbol, quantity, price ],
+                , symbol, quantity, price, details.metadata.industry, details.metadata.pdSectorInd ],
                 async (err, holdings) => {
                     if(err){
                         throw err;
                     } else {
                         try{
-                            await util.addTransactions(userObj.USER_ID, 'Buy', symbol, quantity, price);
+                            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, symbol, quantity, price);
                         } catch(err) {
                             res.status(500).json({"message" : "Exception on adding holdings : " + msg})
                         }

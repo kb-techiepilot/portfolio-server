@@ -46,7 +46,8 @@ async function getHoldings(row) {
     response.overall_percent = (overallPL / ( investedValue / 100 )).toFixed(2);
 
     response.company_name = details.info.companyName;
-    response.industry = details.info.industry;
+    response.industry = details.metadata.industry;
+    response.index = details.metadata.pdSectorInd;
     response.listing_date = details.metadata.listingDate;
 
 
