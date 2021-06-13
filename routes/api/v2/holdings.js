@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
     }
     const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === null || data === []) {
-        res.status(404).json({"message" : "No holdings added"});
+        return res.status(404).json({"message" : "No holdings added"});
     } else {
         // res.status(200).json(data);
         var responseList= [];
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                     responseList.sort((a,b) => {
                         return a.holdings_id - b.holdings_id;
                     })
-                    res.json({
+                    return res.json({
                         "data" : responseList,
                         "meta" : {
                             "count" : responseList.length
@@ -80,10 +80,10 @@ router.get('/:id', async (req, res) => {
     if(data !== undefined) {
         Promise.resolve(holdingsResponse.getHoldings(data))
             .then((response => {
-                res.json(response);
+                return res.json(response);
             }));
     } else {
-        res.status(404).json({"message" : "No holdings added"});
+        return res.status(404).json({"message" : "No holdings added"});
     }
 });
 
@@ -101,7 +101,7 @@ router.post('/', async (req, res) => {
     const details = await nseIndia.getEquityDetails(symbol);
     
     if(details.msg === "no data found") {
-        res.status(404).json({"message" : "Enter valid symbol"});
+        return res.status(404).json({"message" : "Enter valid symbol"});
     } else {
         const data = await util.getHoldings(symbol, userObj.USER_ID, userObj.WORKSPACE_ID);
         if(data !== undefined) {
@@ -117,7 +117,7 @@ router.post('/', async (req, res) => {
                         try{
                             await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, symbol, quantity, price);
                         } catch(err) {
-                            res.status(500).json({"message" : "Exception on adding holdings : " + msg})
+                            return res.status(500).json({"message" : "Exception on adding holdings : " + msg})
                         }
                         const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
                         var responseList= [];
@@ -129,7 +129,7 @@ router.post('/', async (req, res) => {
                                     responseList.sort((a,b) => {
                                         return a.holdings_id - b.holdings_id;
                                     })
-                                    res.json({
+                                    return res.json({
                                         "data" : responseList,
                                         "meta" : {
                                             "count" : responseList.length
@@ -158,43 +158,47 @@ router.delete('/:id', async (req, res) => {
 
     let id = req.params.id;
 
-    const data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
-    if(data === undefined) {
-        res.status(404).json({"message" : "holdings not available to delete"});
+    if(!(Number(id) > 0)) {
+        return res.status(400).json({"message" : "Please give valid id"});
     } else {
-        pool.query(
-            sql.holdings.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
-            async (err) => {
-                if(err) {
-                    throw err;
-                } else {
-                    // res.status(200).json({"message" : "holdings deleted"});
-                    const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
-                    if(data === null || data === []) {
-                        res.status(404).json({"message" : "All holdings deleted"});
+        const data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
+        if(data === undefined) {
+            return res.status(404).json({"message" : "holdings not available to delete"});
+        } else {
+            pool.query(
+                sql.holdings.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
+                async (err) => {
+                    if(err) {
+                        throw err;
                     } else {
-                        var responseList= [];
-                        data.forEach((row, index) => {
-                            Promise.resolve(holdingsResponse.getHoldings(row))
-                            .then((response => {
-                                responseList.push(response);
-                                if(responseList.length == data.length){
-                                    responseList.sort((a,b) => {
-                                        return a.holdings_id - b.holdings_id;
-                                    })
-                                    res.json({
-                                        "data" : responseList,
-                                        "meta" : {
-                                            "count" : responseList.length
-                                        }
-                                    });
-                                }
-                            }));
-                        })
-                    }
-                }  
-            }
-        )
+                        // res.status(200).json({"message" : "holdings deleted"});
+                        const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
+                        if(data === null || data === []) {
+                            return res.status(404).json({"message" : "All holdings deleted"});
+                        } else {
+                            var responseList= [];
+                            data.forEach((row, index) => {
+                                Promise.resolve(holdingsResponse.getHoldings(row))
+                                .then((response => {
+                                    responseList.push(response);
+                                    if(responseList.length == data.length){
+                                        responseList.sort((a,b) => {
+                                            return a.holdings_id - b.holdings_id;
+                                        })
+                                        return res.json({
+                                            "data" : responseList,
+                                            "meta" : {
+                                                "count" : responseList.length
+                                            }
+                                        });
+                                    }
+                                }));
+                            })
+                        }
+                    }  
+                }
+            )
+        }
     }
 });
 
@@ -234,7 +238,7 @@ router.post('/:id', async (req, res) => {
             sql.holdings.update ,[newQuantity, newPrice, new Date(date).getTime() / 1000, data.HOLDINGS_ID, userObj.USER_ID, userObj.WORKSPACE_ID],
             async (err, holdings) => {
                 if(err) {
-                    res.status(500).json({"message" : "Exception while updating holdings : " + err.message});
+                    return res.status(500).json({"message" : "Exception while updating holdings : " + err.message});
                     // throw err;
                 } else {
                     // res.status(200).json(holdings.rows[0]);
@@ -248,7 +252,7 @@ router.post('/:id', async (req, res) => {
                                 responseList.sort((a,b) => {
                                     return a.holdings_id - b.holdings_id;
                                 })
-                                res.json({
+                                return res.json({
                                     "data" : responseList,
                                     "meta" : {
                                         "count" : responseList.length

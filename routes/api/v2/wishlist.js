@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
     }
     const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === null || data === []) {
-        res.status(404).json({"message" : "No wishlist added"});
+        return res.status(404).json({"message" : "No wishlist added"});
     } else {
         var responseList= [];
         data.forEach((row, index) => {
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
 
     const details = await nseIndia.getEquityDetails(symbol)
     if(details.msg === "no data found") {
-        res.status(200).json({"message" : "Enter valid symbol"});
+        return res.status(200).json({"message" : "Enter valid symbol"});
     } else {
         const data = await util.getWishlist(symbol, userObj.USER_ID, userObj.WORKSPACE_ID);
         if(data !== undefined) {
@@ -192,9 +192,12 @@ router.delete('/:id', async (req, res) => {
     }
 
     let id = req.params.id;
+    if(!(Number(id) > 0)) {
+        return res.status(400).json({"message" : "Please give valid id"});
+    }
     const data = await util.getWishlist(id, userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === undefined) {
-        res.status(400).json({"message" : "Stock not added to wishlist"});
+        return res.status(400).json({"message" : "Stock not added to wishlist"});
     } else {
         pool.query(
             sql.wishlist.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
@@ -205,7 +208,7 @@ router.delete('/:id', async (req, res) => {
                     // res.status(200).json({"message" : "wishlist deleted"});
                     const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
                     if(data === null || data === []) {
-                        res.status(404).json({"message" : "All Wishlist deleted"});
+                        return res.status(404).json({"message" : "All Wishlist deleted"});
                     } else {
                         var responseList= [];
                         data.forEach((row, index) => {
@@ -213,7 +216,7 @@ router.delete('/:id', async (req, res) => {
                             .then((response => {
                                 responseList.push(response);
                                     if(responseList.length == data.length){
-                                        res.json({
+                                        return res.json({
                                             "data" : responseList,
                                             "meta" : {
                                                 "count" : responseList.length
