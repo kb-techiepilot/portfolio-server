@@ -22,6 +22,7 @@ const wishlistV2 = require("./routes/api/v2/wishlist");
 const holdingsV2 = require("./routes/api/v2/holdings");
 const transactionsV2 = require("./routes/api/v2/transactions");
 const soldV2 = require("./routes/api/v2/sold");
+const summaryV2 = require("./routes/api/v2/summary");
 
 var app = express();
 
@@ -74,6 +75,8 @@ app.use("/api/v2/wishlist", checkJwt, wishlistV2);
 app.use("/api/v2/holdings", checkJwt, holdingsV2);
 app.use("/api/v2/transactions", checkJwt, transactionsV2);
 app.use("/api/v2/sold", checkJwt, soldV2);
+
+app.use("/api/v2/summary", checkJwt, summaryV2);
 
 
 // error handler

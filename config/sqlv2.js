@@ -13,7 +13,7 @@ module.exports = {
         getPercentage   : `SELECT "SYMBOL", ROUND(((SUM( "PRICE" * "QUANTITY") / (SELECT SUM("PRICE" * "QUANTITY") FROM HOLDINGS WHERE "USER_ID" = $1)) * 100), 2) AS "HOLDING_PERCENTAGE" FROM holdings WHERE "USER_ID" = $1 GROUP BY "SYMBOL", "HOLDINGS_ID" ORDER BY "HOLDINGS_ID"`
     },
     wishlist: {
-        getAll      : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "ADDED_DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "USER_ID" = $1`,
+        getAll      : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "ADDED_DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "USER_ID" = $1 AND "WORKSPACE_ID" = $2`,
         getAllCount : `SELECT COUNT(*) FROM wishlist WHERE "USER_ID" = $1`,
         getById     : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "WISHLIST_ID" = $1 AND "USER_ID" = $2 AND "WORKSPACE_ID" = $3`,
         getBySymbol : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "SYMBOL" = $1 AND "USER_ID" = $2 AND "WORKSPACE_ID" = $3`,

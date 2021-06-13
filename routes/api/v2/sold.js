@@ -8,6 +8,7 @@ const sql  = require("../../../config/sqlv2");
 const user = require("./user");
 
 const util = require('./utils');
+const soldResponse = require("../../../response/sold");
 
 //getting all sold
 router.get('/', async (req, res) => {
@@ -20,7 +21,29 @@ router.get('/', async (req, res) => {
         const soldData = await pool.query(
             sql.sold.getAll, [userObj.USER_ID]
         );
-        res.json(soldData.rows);
+        if(soldData.rows === null || soldData.rows.length === 0) {
+            res.status(404).json({"message" : "No sold details"});
+        } else {
+            const data = soldData.rows;
+            var responseList= [];
+            data.forEach((row, index) => {
+                Promise.resolve(soldResponse.getSolds(row))
+                .then((response => {
+                    responseList.push(response);
+                    if(responseList.length == data.length){
+                        responseList.sort((a,b) => {
+                            return a.date - b.date;
+                        })
+                        res.json({
+                            "data" : responseList,
+                            "meta" : {
+                                "count" : responseList.length
+                            }
+                        });
+                    }
+                }));
+            })
+        }
 
     }catch (err) {
         res.json({"message" : "Error while fetching sold details " + err.message})

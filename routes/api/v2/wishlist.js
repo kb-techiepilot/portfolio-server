@@ -4,12 +4,29 @@ const { NseIndia } = require("stock-nse-india");
 const pool = require("../../../db/db");
 const sql  = require("../../../config/sqlv2");
 const user = require("./user");
+const util = require("./utils");
 
 const router = express.Router();
 
 const wishlistResponse = require("../../../response/wishlist");
 
 const nseIndia = new NseIndia();
+
+async function getAllWishlist(userId, workspaceId){
+
+    try {
+        const data = await pool.query(
+            sql.wishlist.getAll, [userId, workspaceId]
+        );
+        if(data.rows.length === 0 ) {
+            return null
+        } else {
+            return data.rows;
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
+}
 
 //getting all wishlist
 router.get('/', async (req, res) => {
@@ -18,29 +35,26 @@ router.get('/', async (req, res) => {
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
     }
-    pool.query(
-        sql.wishlist.getAll, [userObj.USER_ID],
-        (err, wishlist) => {
-            if(err) {
-                throw err;
-            }
-            if(wishlist.rows.length === 0) {
-                return res.status(200).json({"message" : "No wishlist added"});
-            } else {
-                var responseList= [];
-                wishlist.rows.forEach((row, index) => {
-                    
-                    Promise.resolve(wishlistResponse.getAllWishlist(row))
-                    .then((response => {
-                        responseList.push(response);
-                        if(responseList.length == wishlist.rows.length){
-                            res.json(responseList);
-                        }
-                    }));
-                })
-            }
-        }
-    )
+    const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
+    if(data === null || data === []) {
+        res.status(404).json({"message" : "No wishlist added"});
+    } else {
+        var responseList= [];
+        data.forEach((row, index) => {
+            Promise.resolve(wishlistResponse.getAllWishlist(row))
+            .then((response => {
+                responseList.push(response);
+                    if(responseList.length == data.length){
+                        res.json({
+                            "data" : responseList,
+                            "meta" : {
+                                "count" : responseList.length
+                            }
+                        });
+                    }
+            }));
+        })
+    }
 });
 
 
@@ -63,7 +77,7 @@ router.get('/:id', async (req, res) => {
                 throw err;
             }
             if(wishlist.rows.length === 0) {
-                return res.status(200).json({"message" : "No wishlist added"});
+                return res.status(404).json({"message" : "No wishlist added"});
             } else {
                 Promise.resolve(wishlistResponse.getWishlist(wishlist.rows[0]))
                     .then((response => {
@@ -87,31 +101,40 @@ router.post('/', async (req, res) => {
     if(details.msg === "no data found") {
         res.status(200).json({"message" : "Enter valid symbol"});
     } else {
-        pool.query(
-            sql.wishlist.getBySymbol, [ symbol, userObj.USER_ID, userObj.WORKSPACE_ID],
-            (err, wishlist) => {
-                if(err) {
-                    throw err;
+        const data = await util.getWishlist(symbol, userObj.USER_ID, userObj.WORKSPACE_ID);
+        if(data !== undefined) {
+            return res.status(400).json({"message" : "Stock already added to the wishlist"});
+        }else {
+            pool.query(
+                sql.wishlist.insert, [userObj.USER_ID, userObj.WORKSPACE_ID, symbol, details.priceInfo.lastPrice ],
+                async (err) => {
+                    if(err){
+                        throw err;
+                    } else {
+                        const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
+                        var responseList= [];
+                        data.forEach((row, index) => {
+                            Promise.resolve(wishlistResponse.getAllWishlist(row))
+                            .then((response => {
+                                responseList.push(response);
+                                    if(responseList.length == data.length){
+                                        res.json({
+                                            "data" : responseList,
+                                            "meta" : {
+                                                "count" : responseList.length
+                                            }
+                                        });
+                                    }
+                            }));
+                        })
+                    }
                 }
-                if(wishlist.rows.length > 0) {
-                    return res.status(200).json({"message" : "Stock already added to the wishlist"});
-                } else {
-                    pool.query(
-                        sql.wishlist.insert, [userObj.USER_ID, userObj.WORKSPACE_ID, symbol, details.priceInfo.lastPrice ],
-                        (err, wishlist) => {
-                            if(err){
-                                throw err;
-                            }
-                            res.json(wishlist.rows[0]);
-                        }
-                    );
-                }
-            }
-        );
+            );
+        }
     }
 });
 
-//buld insert
+//bulk insert - need to workout
 router.post('/bulk', async (req, res) => {
     const { symbols, workspace } = req.query;
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
@@ -171,11 +194,27 @@ router.delete('/:id', async (req, res) => {
     let id = req.params.id;
     pool.query(
         sql.wishlist.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
-        (err, wishlist) => {
+        async (err) => {
             if(err) {
                 throw err;
             } else {
-                res.status(200).json({"message" : "wishlist deleted"});
+                // res.status(200).json({"message" : "wishlist deleted"});
+                const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
+                var responseList= [];
+                data.forEach((row, index) => {
+                    Promise.resolve(wishlistResponse.getAllWishlist(row))
+                    .then((response => {
+                        responseList.push(response);
+                            if(responseList.length == data.length){
+                                res.json({
+                                    "data" : responseList,
+                                    "meta" : {
+                                        "count" : responseList.length
+                                    }
+                                });
+                            }
+                    }));
+                })
             }  
         }
     )

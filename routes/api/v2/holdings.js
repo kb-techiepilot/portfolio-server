@@ -52,7 +52,12 @@ router.get('/', async (req, res) => {
                     responseList.sort((a,b) => {
                         return a.holdings_id - b.holdings_id;
                     })
-                    res.json(responseList);
+                    res.json({
+                        "data" : responseList,
+                        "meta" : {
+                            "count" : responseList.length
+                        }
+                    });
                 }
             }));
         })
@@ -124,7 +129,12 @@ router.post('/', async (req, res) => {
                                     responseList.sort((a,b) => {
                                         return a.holdings_id - b.holdings_id;
                                     })
-                                    res.status(200).json(responseList);
+                                    res.json({
+                                        "data" : responseList,
+                                        "meta" : {
+                                            "count" : responseList.length
+                                        }
+                                    });
                                 }
                             }));
                         })
@@ -169,7 +179,12 @@ router.delete('/:id', async (req, res) => {
                                 responseList.sort((a,b) => {
                                     return a.holdings_id - b.holdings_id;
                                 })
-                                res.status(200).json(responseList);
+                                res.json({
+                                    "data" : responseList,
+                                    "meta" : {
+                                        "count" : responseList.length
+                                    }
+                                });
                             }
                         }));
                     })
@@ -229,7 +244,12 @@ router.post('/:id', async (req, res) => {
                                 responseList.sort((a,b) => {
                                     return a.holdings_id - b.holdings_id;
                                 })
-                                res.status(200).json(responseList);
+                                res.json({
+                                    "data" : responseList,
+                                    "meta" : {
+                                        "count" : responseList.length
+                                    }
+                                });
                             }
                         }));
                     })

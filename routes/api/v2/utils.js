@@ -24,6 +24,18 @@ async function getHoldings(id, userId, workspaceId) {
     }
 }
 
+async function getWishlist(id, userId, workspaceId) {
+    try {
+        const res = await pool.query(
+            (Number(id) > 0) ?
+            sql.wishlist.getById : sql.wishlist.getBySymbol,[id, userId, workspaceId]
+        );
+        return res.rows[0];
+      } catch (err) {
+        return err.stack;
+    }
+}
+
 async function deleteHoldings(userId, workspaceId, holdingsId){
     try{
         const res = await pool.query(
@@ -58,6 +70,7 @@ async function addTransactions(userId, type, symbol, quantity, price) {
 
 exports.addSoldEntry = addSoldEntry;
 exports.getHoldings = getHoldings;
+exports.getWishlist = getWishlist;
 exports.deleteHoldings = deleteHoldings;
 exports.updateHoldings = updateHoldings;
 exports.addTransactions = addTransactions;
