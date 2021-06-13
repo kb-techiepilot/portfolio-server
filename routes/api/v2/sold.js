@@ -63,7 +63,7 @@ router.post('/:id', async (req, res) => {
 
         if(partial === "true") {
             if(holdingsData.QUANTITY < quantity ) {
-                res.json({"message" : "Insufficient quantity in funds"});
+                return res.json({"message" : "Insufficient quantity in funds"});
             } else {
                 const newQuantity = Number(holdingsData.QUANTITY) - quantity;
                 if(newQuantity > 0) {
