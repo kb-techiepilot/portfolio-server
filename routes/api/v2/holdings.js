@@ -170,24 +170,28 @@ router.delete('/:id', async (req, res) => {
                 } else {
                     // res.status(200).json({"message" : "holdings deleted"});
                     const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
-                    var responseList= [];
-                    data.forEach((row, index) => {
-                        Promise.resolve(holdingsResponse.getHoldings(row))
-                        .then((response => {
-                            responseList.push(response);
-                            if(responseList.length == data.length){
-                                responseList.sort((a,b) => {
-                                    return a.holdings_id - b.holdings_id;
-                                })
-                                res.json({
-                                    "data" : responseList,
-                                    "meta" : {
-                                        "count" : responseList.length
-                                    }
-                                });
-                            }
-                        }));
-                    })
+                    if(data === null || data === []) {
+                        res.status(404).json({"message" : "All holdings deleted"});
+                    } else {
+                        var responseList= [];
+                        data.forEach((row, index) => {
+                            Promise.resolve(holdingsResponse.getHoldings(row))
+                            .then((response => {
+                                responseList.push(response);
+                                if(responseList.length == data.length){
+                                    responseList.sort((a,b) => {
+                                        return a.holdings_id - b.holdings_id;
+                                    })
+                                    res.json({
+                                        "data" : responseList,
+                                        "meta" : {
+                                            "count" : responseList.length
+                                        }
+                                    });
+                                }
+                            }));
+                        })
+                    }
                 }  
             }
         )

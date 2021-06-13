@@ -200,21 +200,25 @@ router.delete('/:id', async (req, res) => {
             } else {
                 // res.status(200).json({"message" : "wishlist deleted"});
                 const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
-                var responseList= [];
-                data.forEach((row, index) => {
-                    Promise.resolve(wishlistResponse.getAllWishlist(row))
-                    .then((response => {
-                        responseList.push(response);
-                            if(responseList.length == data.length){
-                                res.json({
-                                    "data" : responseList,
-                                    "meta" : {
-                                        "count" : responseList.length
-                                    }
-                                });
-                            }
-                    }));
-                })
+                if(data === null || data === []) {
+                    res.status(404).json({"message" : "All Wishlist deleted"});
+                } else {
+                    var responseList= [];
+                    data.forEach((row, index) => {
+                        Promise.resolve(wishlistResponse.getAllWishlist(row))
+                        .then((response => {
+                            responseList.push(response);
+                                if(responseList.length == data.length){
+                                    res.json({
+                                        "data" : responseList,
+                                        "meta" : {
+                                            "count" : responseList.length
+                                        }
+                                    });
+                                }
+                        }));
+                    })
+                }
             }  
         }
     )
