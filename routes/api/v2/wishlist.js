@@ -192,36 +192,41 @@ router.delete('/:id', async (req, res) => {
     }
 
     let id = req.params.id;
-    pool.query(
-        sql.wishlist.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
-        async (err) => {
-            if(err) {
-                throw err;
-            } else {
-                // res.status(200).json({"message" : "wishlist deleted"});
-                const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
-                if(data === null || data === []) {
-                    res.status(404).json({"message" : "All Wishlist deleted"});
+    const data = await util.getWishlist(id, userObj.USER_ID, userObj.WORKSPACE_ID);
+    if(data === undefined) {
+        res.status(400).json({"message" : "Stock not added to wishlist"});
+    } else {
+        pool.query(
+            sql.wishlist.delete ,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
+            async (err) => {
+                if(err) {
+                    throw err;
                 } else {
-                    var responseList= [];
-                    data.forEach((row, index) => {
-                        Promise.resolve(wishlistResponse.getAllWishlist(row))
-                        .then((response => {
-                            responseList.push(response);
-                                if(responseList.length == data.length){
-                                    res.json({
-                                        "data" : responseList,
-                                        "meta" : {
-                                            "count" : responseList.length
-                                        }
-                                    });
-                                }
-                        }));
-                    })
-                }
-            }  
-        }
-    )
+                    // res.status(200).json({"message" : "wishlist deleted"});
+                    const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
+                    if(data === null || data === []) {
+                        res.status(404).json({"message" : "All Wishlist deleted"});
+                    } else {
+                        var responseList= [];
+                        data.forEach((row, index) => {
+                            Promise.resolve(wishlistResponse.getAllWishlist(row))
+                            .then((response => {
+                                responseList.push(response);
+                                    if(responseList.length == data.length){
+                                        res.json({
+                                            "data" : responseList,
+                                            "meta" : {
+                                                "count" : responseList.length
+                                            }
+                                        });
+                                    }
+                            }));
+                        })
+                    }
+                }  
+            }
+        )
+    }
 });
 
 module.exports = router;
