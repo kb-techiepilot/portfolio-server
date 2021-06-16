@@ -13,6 +13,9 @@ async function getAllWishlist(row) {
     try {
         const details = await nseIndia.getEquityDetails(symbol);
         
+        response.company_name = details.info.companyName;
+        response.industry = details.metadata.industry;
+        response.index = details.metadata.pdSectorInd;
         response.change = details.priceInfo.change.toFixed(2);
         response.percent_change = details.priceInfo.pChange.toFixed(2);
         response.current_price = details.priceInfo.lastPrice;
@@ -31,6 +34,7 @@ async function getWishlist(row) {
     const symbol = row.SYMBOL;
 
     const details = await nseIndia.getEquityDetails(symbol);   
+    console.log(details);
     const price = parseFloat(row.PRICE).toFixed(2);
     const currentPrice = details.priceInfo.lastPrice.toFixed(2);
     const overallChange = currentPrice - price;
@@ -42,6 +46,7 @@ async function getWishlist(row) {
 
     response.company_name = details.info.companyName;
     response.industry = details.info.industry;
+    response.index = details.metadata.pdSectorInd;
     response.listing_date = details.metadata.listingDate;
 
     response.open = details.priceInfo.open.toFixed(2);

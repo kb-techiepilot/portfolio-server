@@ -23,6 +23,8 @@ const holdingsV2 = require("./routes/api/v2/holdings");
 const transactionsV2 = require("./routes/api/v2/transactions");
 const soldV2 = require("./routes/api/v2/sold");
 const summaryV2 = require("./routes/api/v2/summary");
+const indexesV2 = require("./routes/api/v2/indexDetails");
+const gainersV2 = require("./routes/api/v2/gainersLosers");
 
 var app = express();
 
@@ -80,6 +82,8 @@ app.use("/api/v2/symbols", symbols);
 app.use("/api/v2/news", news);
 
 app.use("/api/v2/summary", checkJwt, summaryV2);
+app.use("/api/v2/indexes", checkJwt, indexesV2);
+app.use("/api/v2/gainers", checkJwt, gainersV2);
 
 
 // error handler
