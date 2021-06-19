@@ -46,7 +46,7 @@ router.get('/data', async (req, res) => {
     res.json(response);
 });
 
-router.get('/all', async(req, res) => {
+router.get('/allsymbols', async(req, res) => {
     var data = symCache.get("allSymbols");
     if(data === undefined) {
         data = [];
@@ -58,8 +58,6 @@ router.get('/all', async(req, res) => {
             data[i-1] = [parsedCsv[i][0], parsedCsv[i][1]];
         }
         const success = symCache.set("allSymbols", data, 100000);
-    } else {
-        console.log("available in cache");
     }
     res.json(data);
 })
