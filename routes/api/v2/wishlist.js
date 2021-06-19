@@ -90,7 +90,7 @@ router.get('/:id', async (req, res) => {
 
 //adding wishlist
 router.post('/', async (req, res) => {
-    const { symbol, workspace } = req.query;
+    const { symbol, workspace } = req.body;
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
 
     if(userObj === null) {

@@ -41,5 +41,9 @@ module.exports = {
         getAll      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1`,
         getAllCount : `SELECT COUNT(*) FROM transactions WHERE "USER_ID" = $1`,
         insert      : `INSERT INTO transactions ("USER_ID", "TYPE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT") VALUES ($1, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "TRANSACTION_ID"`
+    },
+
+    symbol: {
+        wishlistAndHoldings : `select "WISHLIST_ID", "HOLDINGS_ID" from holdings FULL OUTER JOIN wishlist on holdings."SYMBOL" = wishlist."SYMBOL" where holdings."USER_ID" = wishlist."USER_ID" AND holdings."USER_ID" = $1 AND wishlist."SYMBOL"=$2 OR holdings."SYMBOL" = $2`
     }
 }
