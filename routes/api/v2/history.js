@@ -36,7 +36,7 @@ router.get('/:symbol', async (req, res) => {
     history = [];
     data = [];
     historyData.forEach(ele => {
-        data = [new Date(ele.CH_TIMESTAMP).getTime(), ele.CH_CLOSING_PRICE];
+        data = [ele.CH_TIMESTAMP, ele.CH_CLOSING_PRICE];
         history.push(data);
         data = [];
     })

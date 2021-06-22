@@ -25,7 +25,9 @@ const soldV2 = require("./routes/api/v2/sold");
 const summaryV2 = require("./routes/api/v2/summary");
 const historyV2 = require("./routes/api/v2/history");
 const indexesV2 = require("./routes/api/v2/indexDetails");
-const gainersV2 = require("./routes/api/v2/gainersLosers");
+
+const nse = require("./routes/api/v2/nse");
+
 var app = express();
 
 // view engine setup
@@ -82,8 +84,9 @@ app.use("/api/v2/symbols", symbols);
 app.use("/api/v2/news", news);
 
 app.use("/api/v2/summary", checkJwt, summaryV2);
-app.use("/api/v2/indexes", checkJwt, indexesV2);
-app.use("/api/v2/gainers", checkJwt, gainersV2);
+app.use("/api/v2/indexes", indexesV2);
+
+app.use("/api/v2/nse", nse);
 
 
 // error handler
