@@ -67,7 +67,7 @@ router.get('/chart', async (req, res) => {
                 var responseList = [];
                 var result = {};
                 summary.rows.forEach((row, index) => {
-                    result.symbol = row.SYMBOL;
+                    result.index = row.INDEX;
                     result.percentage = row.HOLDING_PERCENTAGE;
                     responseList.push(result);
                     result = {};

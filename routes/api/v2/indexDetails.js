@@ -19,7 +19,9 @@ router.get('/all', async (req, res) => {
 
 router.get('/intraday/:symbol', async(req,res) => {
     const data = await nseIndia.getIndexIntradayData(req.params.symbol);
-    res.json(data);
+    var responseData = {};
+    responseData.intra = data.grapthData;
+    res.json(responseData);
 });
 
 module.exports = router;
