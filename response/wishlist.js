@@ -19,6 +19,8 @@ async function getAllWishlist(row) {
         response.change = details.priceInfo.change.toFixed(2);
         response.percent_change = details.priceInfo.pChange.toFixed(2);
         response.current_price = details.priceInfo.lastPrice;
+        response.year_high = details.priceInfo.weekHighLow.max;
+        response.year_low = details.priceInfo.weekHighLow.min;
     } catch(err){
         console.log(err);
         throw err;
@@ -59,6 +61,9 @@ async function getWishlist(row) {
 
     response.overall_change = overallChange.toFixed(2);
     response.overall_percent = ((overallChange / price) * 100).toFixed(2);
+
+    response.year_high = details.priceInfo.weekHighLow.max;
+    response.year_low = details.priceInfo.weekHighLow.min;
 
     return response;
 
