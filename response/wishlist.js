@@ -36,7 +36,9 @@ async function getWishlist(row) {
     const symbol = row.SYMBOL;
 
     const details = await nseIndia.getEquityDetails(symbol);   
-    console.log(details);
+    const trade = await nseIndia.getEquityTradeInfo(symbol);
+    console.log(trade);
+
     const price = parseFloat(row.PRICE).toFixed(2);
     const currentPrice = details.priceInfo.lastPrice.toFixed(2);
     const overallChange = currentPrice - price;
@@ -52,9 +54,9 @@ async function getWishlist(row) {
     response.listing_date = details.metadata.listingDate;
 
     response.open = details.priceInfo.open.toFixed(2);
-    response.dayHigh = details.priceInfo.intraDayHighLow.max.toFixed(2);
-    response.dayLow = details.priceInfo.intraDayHighLow.min.toFixed(2);
-    response.previousClose = details.priceInfo.previousClose.toFixed(2);
+    response.day_high = details.priceInfo.intraDayHighLow.max.toFixed(2);
+    response.day_low = details.priceInfo.intraDayHighLow.min.toFixed(2);
+    response.previous_close = details.priceInfo.previousClose.toFixed(2);
     response.change = details.priceInfo.change.toFixed(2);    
     response.percent_change = details.priceInfo.pChange.toFixed(2);
     response.current_price = currentPrice;
@@ -64,6 +66,18 @@ async function getWishlist(row) {
 
     response.year_high = details.priceInfo.weekHighLow.max;
     response.year_low = details.priceInfo.weekHighLow.min;
+
+    response.lower_cp = details.priceInfo.lowerCP;
+    response.higher_cp = details.priceInfo.upperCP;
+
+    response.avg_price = details.priceInfo.vwap;
+
+    response.trade = {};
+    response.trade.total_buy_qty = trade.marketDeptOrderBook.totalBuyQuantity;
+    response.trade.total_sell_qty = trade.marketDeptOrderBook.totalSellQuantity;
+    response.trade.bids = trade.marketDeptOrderBook.bid;
+    response.trade.asks = trade.marketDeptOrderBook.ask;
+    response.trade.volume = trade.marketDeptOrderBook.tradeInfo.totalTradedValue;
 
     return response;
 
