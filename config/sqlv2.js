@@ -13,7 +13,7 @@ module.exports = {
         getPercentage   : `SELECT "INDEX", ROUND(((SUM( "PRICE" * "QUANTITY") / (SELECT SUM("PRICE" * "QUANTITY") FROM HOLDINGS WHERE "USER_ID" = $1)) * 100), 2) AS "HOLDING_PERCENTAGE" FROM holdings WHERE "USER_ID" = $1 GROUP BY "SYMBOL", "INDEX" ORDER BY "INDEX"`
     },
     wishlist: {
-        getAll      : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "ADDED_DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "USER_ID" = $1 AND "WORKSPACE_ID" = $2`,
+        getAll      : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "ADDED_DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "USER_ID" = $1 AND "WORKSPACE_ID" = $2 ORDER BY "WISHLIST_ID" ASC`,
         getAllCount : `SELECT COUNT(*) FROM wishlist WHERE "USER_ID" = $1`,
         getById     : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "WISHLIST_ID" = $1 AND "USER_ID" = $2 AND "WORKSPACE_ID" = $3`,
         getBySymbol : `SELECT "WISHLIST_ID", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "PRICE" FROM wishlist WHERE "SYMBOL" = $1 AND "USER_ID" = $2 AND "WORKSPACE_ID" = $3`,
@@ -41,7 +41,8 @@ module.exports = {
         getAll      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1`,
         getTop      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1 ORDER BY "DATE" DESC LIMIT 10`,
         getAllCount : `SELECT COUNT(*) FROM transactions WHERE "USER_ID" = $1`,
-        insert      : `INSERT INTO transactions ("USER_ID", "TYPE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT") VALUES ($1, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "TRANSACTION_ID"`
+        insert      : `INSERT INTO transactions ("USER_ID", "TYPE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT") VALUES ($1, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "TRANSACTION_ID"`,
+        summary     : `SELECT SUM("AMOUNT") AS "AMOUNT", "TYPE" AS "LABEL" FROM transactions WHERE "USER_ID" = $1 GROUP BY "TYPE" UNION SELECT SUM(("PRICE"*"QUANTITY"))AS "AMOUNT", 'Current' as "LABEL" FROM HOLDINGS WHERE "USER_ID" = $1`
     },
 
     symbol: {
