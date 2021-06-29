@@ -77,7 +77,16 @@ router.get('/:id', async (req, res) => {
                 throw err;
             }
             if(wishlist.rows.length === 0) {
-                return res.status(404).json({"message" : "No wishlist added"});
+                if(Number(id) > 0 ) {
+                    return res.status(404).json({"message" : "No wishlist added"});
+                } else {
+                    var row = {};
+                    row.SYMBOL = id;
+                    Promise.resolve(wishlistResponse.getWishlist(row))
+                    .then((response => {
+                        res.json(response);
+                    }));
+                }
             } else {
                 Promise.resolve(wishlistResponse.getWishlist(wishlist.rows[0]))
                     .then((response => {
@@ -118,6 +127,12 @@ router.post('/', async (req, res) => {
                             .then((response => {
                                 responseList.push(response);
                                     if(responseList.length == data.length){
+
+
+                                        responseList.sort(function(a,b){
+                                            return a.wishlist_id - b.wishlist_id;
+                                            }
+                                        );
                                         res.json({
                                             "data" : responseList,
                                             "meta" : {

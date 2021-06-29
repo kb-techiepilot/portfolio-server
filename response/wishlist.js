@@ -43,7 +43,7 @@ async function getWishlist(row) {
     const currentPrice = details.priceInfo.lastPrice.toFixed(2);
     const overallChange = currentPrice - price;
 
-    response.wishlist_id = row.WISHLIST_ID;
+    response.wishlist_id = Number(row.WISHLIST_ID);
     response.symbol = symbol;
     response.added_on = row.DATE;
     response.price = price;
