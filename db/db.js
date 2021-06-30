@@ -10,13 +10,13 @@ const Pool = require("pg").Pool;
 // });
 
 //dbconfig for V2
-// const pool = new Pool({
-//     user: "postgres",
-//     password: "root",
-//     database: "portv2",
-//     host: "localhost",
-//     port: "5432"
-// });
+const pool = new Pool({
+    user: "postgres",
+    password: "root",
+    database: "portv2",
+    host: "localhost",
+    port: "5432"
+});
 
 //heroku configuration for V1
 // const pool = new Pool({
@@ -29,14 +29,14 @@ const Pool = require("pg").Pool;
 // });
 
 //heroku configuration for V2
-const pool = new Pool({
-    user: "auvoanjugvszuy",
-    password: "8c87548ac07ae429548cf961d419efb951c3a4a41f33e012ce4403f8c54ebad9",
-    database: "dalhvchjeh35l9",
-    host: "ec2-34-193-101-0.compute-1.amazonaws.com",
-    port: "5432",
-    ssl: { rejectUnauthorized: false }
-});
+// const pool = new Pool({
+//     user: "auvoanjugvszuy",
+//     password: "8c87548ac07ae429548cf961d419efb951c3a4a41f33e012ce4403f8c54ebad9",
+//     database: "dalhvchjeh35l9",
+//     host: "ec2-34-193-101-0.compute-1.amazonaws.com",
+//     port: "5432",
+//     ssl: { rejectUnauthorized: false }
+// });
 
 //azure psql configs
 // const pool = new Pool({

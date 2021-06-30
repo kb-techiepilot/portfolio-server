@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
     }
     const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === null || data === []) {
-        return res.status(404).json({"message" : "No wishlist added"});
+        return res.json({"message" : "No wishlist added", "data": []});
     } else {
         var responseList= [];
         data.forEach((row, index) => {
@@ -223,7 +223,7 @@ router.delete('/:id', async (req, res) => {
                     // res.status(200).json({"message" : "wishlist deleted"});
                     const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
                     if(data === null || data === []) {
-                        return res.status(404).json({"message" : "All Wishlist deleted"});
+                        return res.status(202).json({"message" : "All Wishlist deleted", "data":[]});
                     } else {
                         var responseList= [];
                         data.forEach((row, index) => {

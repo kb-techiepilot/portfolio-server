@@ -37,7 +37,6 @@ async function getWishlist(row) {
 
     const details = await nseIndia.getEquityDetails(symbol);   
     const trade = await nseIndia.getEquityTradeInfo(symbol);
-    console.log(trade);
 
     const price = parseFloat(row.PRICE).toFixed(2);
     const currentPrice = details.priceInfo.lastPrice.toFixed(2);
