@@ -32,7 +32,7 @@ async function getHoldings(row) {
     response.symbol = symbol;
     response.quantity = quantity,
     response.price = price,
-    response.invested_value = investedValue;
+    response.invested_value = investedValue.toFixed(2);
     response.purchase_date = purchasedDate;
     response.updated_date = updatedDate;
 

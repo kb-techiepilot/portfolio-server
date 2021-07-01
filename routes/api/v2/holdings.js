@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
     }
     const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === null || data === []) {
-        return res.status(404).json({"message" : "No holdings added"});
+        return res.status(200).json({"message" : "No holdings added", "data": []});
     } else {
         // res.status(200).json(data);
         var responseList= [];
@@ -83,7 +83,7 @@ router.get('/:id', async (req, res) => {
                 return res.json(response);
             }));
     } else {
-        return res.status(404).json({"message" : "No holdings added"});
+        return res.status(200).json({"message" : "No holdings added", "data": []});
     }
 });
 

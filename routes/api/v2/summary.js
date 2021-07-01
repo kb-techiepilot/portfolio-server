@@ -28,6 +28,7 @@ router.get('/', async (req, res) => {
             } else {
                 var totalAmount = 0;
                 var currentAmount = 0;
+                var dayChange = 0;
                 var tempArray = [];
                 var result = {};
                 summary.rows.forEach((row, index) => {
@@ -36,12 +37,15 @@ router.get('/', async (req, res) => {
                     .then(response => {
                         var currentPrice = response.priceInfo.lastPrice;
                         currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
+                        dayChange = dayChange + ( row.QUANTITY * response.priceInfo.change);
                         tempArray.push(totalAmount);
                         if(summary.rows.length === tempArray.length){
                             result.total_amount = totalAmount.toFixed(0);
                             result.current_amount = currentAmount.toFixed(0);
                             result.difference = (currentAmount - totalAmount).toFixed(0);
                             result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
+                            result.day_change = dayChange.toFixed(0);
+                            result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
                             res.json(result);
                         }
                     });
