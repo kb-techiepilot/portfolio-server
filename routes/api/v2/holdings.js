@@ -90,7 +90,7 @@ router.get('/:id', async (req, res) => {
 //adding holdings
 router.post('/', async (req, res) => {
     
-    const { workspace, date, symbol, quantity, price  } = req.query;
+    const { workspace, date, symbol, quantity, price  } = req.body;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
     

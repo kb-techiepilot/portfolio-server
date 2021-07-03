@@ -106,7 +106,7 @@ router.post('/', async (req, res) => {
         return res.status(200).json({"message" : "Workspace not found"});
     }
 
-    const details = await nseIndia.getEquityDetails(symbol)
+    const details = await nseIndia.getEquityDetails(symbol);
     if(details.msg === "no data found") {
         return res.status(200).json({"message" : "Enter valid symbol"});
     } else {
