@@ -10,15 +10,13 @@ async function getTransactions(row) {
     response.date = row.DATE;
     response.symbol = row.SYMBOL
 
-    const details = await nseIndia.getEquityDetails(row.SYMBOL);
+    // const details = await nseIndia.getEquityDetails(row.SYMBOL);
 
-    response.company_name = details.info.companyName;
+    // response.company_name = details.info.companyName;
     response.exchange = row.EXCHANGE;
     response.quantity = row.QUANTITY;
     response.price = row.PRICE;
     response.amount = row.AMOUNT;
-
-    return response;
 
     return response;
 }

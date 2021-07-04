@@ -61,14 +61,24 @@ router.get('/', async (req, res) => {
 //getting single wishlist
 router.get('/:id', async (req, res) => {
 
+    var wishlistResponseObj = {};
+
     const { workspace } = req.query;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'wishlist', req.headers.authorization);
+    const holdingsUserObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
 
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
     }
     let id = req.params.id;
+    var holdings = await util.getHoldings(id, userObj.USER_ID, holdingsUserObj.WORKSPACE_ID);
+    var holdingsResponse = {};
+    if(holdings !== undefined) {
+        holdingsResponse.holdings_id = holdings.HOLDINGS_ID;
+        holdingsResponse.quantity = holdings.QUANTITY;
+        holdingsResponse.price = holdings.PRICE;
+    }
     pool.query(
         (Number(id) > 0) ?
         sql.wishlist.getById : sql.wishlist.getBySymbol,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
@@ -84,13 +94,17 @@ router.get('/:id', async (req, res) => {
                     row.SYMBOL = id;
                     Promise.resolve(wishlistResponse.getWishlist(row))
                     .then((response => {
-                        res.json(response);
+                        wishlistResponseObj.wishlist = response;
+                        wishlistResponseObj.holdings = holdingsResponse;
+                        res.json(wishlistResponseObj);
                     }));
                 }
             } else {
                 Promise.resolve(wishlistResponse.getWishlist(wishlist.rows[0]))
                     .then((response => {
-                        res.json(response);
+                        wishlistResponseObj.wishlist = response;
+                        wishlistResponseObj.holdings = holdingsResponse;
+                        res.json(wishlistResponseObj);
                     }));
             }  
         }

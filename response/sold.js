@@ -9,9 +9,9 @@ async function getSolds(row) {
     response.date = row.DATE;
     response.symbol = row.SYMBOL
 
-    const details = await nseIndia.getEquityDetails(row.SYMBOL);
+    // const details = await nseIndia.getEquityDetails(row.SYMBOL);
 
-    response.company_name = details.info.companyName;
+    // response.company_name = details.info.companyName;
     response.exchange = row.EXCHANGE;
     response.quantity = row.QUANTITY;
     response.buy_price = row.BUY_PRICE;

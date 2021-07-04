@@ -76,13 +76,21 @@ router.get('/:id', async (req, res) => {
     }
 
     let id = req.params.id;
-    const data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
+    var data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data !== undefined) {
         Promise.resolve(holdingsResponse.getHoldings(data))
             .then((response => {
                 return res.json(response);
             }));
-    } else {
+    } else if(isNaN(id)) {
+        data = {};
+        data.SYMBOL = id;
+        Promise.resolve(holdingsResponse.getHoldings(data))
+            .then((response => {
+                return res.json(response);
+            }));
+    }
+    else {
         return res.status(200).json({"message" : "No holdings added", "data": []});
     }
 });
@@ -207,7 +215,7 @@ router.post('/:id', async (req, res) => {
     
     let id = req.params.id;    
     
-    var { workspace, date, symbol, quantity, price, average } = req.query;
+    var { workspace, date, symbol, quantity, price, average } = req.body;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
 

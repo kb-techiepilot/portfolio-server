@@ -32,14 +32,14 @@ module.exports = {
     },
 
     sold: {
-        getAll      : `SELECT "SOLD_ID", TO_TIMESTAMP("BUY_DATE")::date AS "BUY_DATE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "BUY_PRICE", "SELL_PRICE" FROM sold WHERE "USER_ID" = $1`,
+        getAll      : `SELECT "SOLD_ID", TO_TIMESTAMP("BUY_DATE")::date AS "BUY_DATE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "BUY_PRICE", "SELL_PRICE" FROM sold WHERE "USER_ID" = $1 ORDER BY "SOLD_ID" DESC`,
         getAllCount : `SELECT COUNT(*) FROM sold WHERE "USER_ID" = $1`,
         insert      : `INSERT INTO sold ("USER_ID", "BUY_DATE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "BUY_PRICE", "SELL_PRICE") VALUES ($1, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "SOLD_ID", "SYMBOL"`
     },
 
     transaction: {
-        getAll      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1`,
-        getTop      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1 ORDER BY "DATE" DESC LIMIT 10`,
+        getAll      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1 ORDER BY "TRANSACTION_ID" DESC`,
+        getTop      : `SELECT "TRANSACTION_ID", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions WHERE "USER_ID" = $1 ORDER BY "TRANSACTION_ID" DESC LIMIT 10`,
         getAllCount : `SELECT COUNT(*) FROM transactions WHERE "USER_ID" = $1`,
         insert      : `INSERT INTO transactions ("USER_ID", "TYPE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT") VALUES ($1, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "TRANSACTION_ID"`,
         summary     : `SELECT SUM("AMOUNT") AS "AMOUNT", "TYPE" AS "LABEL" FROM transactions WHERE "USER_ID" = $1 GROUP BY "TYPE" UNION SELECT SUM(("PRICE"*"QUANTITY"))AS "AMOUNT", 'Current' as "LABEL" FROM HOLDINGS WHERE "USER_ID" = $1`

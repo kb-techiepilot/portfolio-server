@@ -28,7 +28,7 @@ async function getHoldings(row) {
     const overallPL = currentValue - investedValue;
 
 
-    response.holdings_id = row.HOLDINGS_ID;
+    response.holdings_id = Number(row.HOLDINGS_ID);
     response.symbol = symbol;
     response.quantity = quantity,
     response.price = price,

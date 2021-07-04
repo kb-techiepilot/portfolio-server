@@ -17,7 +17,6 @@ router.get('/', async (req, res) => {
             sql.transaction.getAll,[userObj.USER_ID]
         );
         const data = resData.rows;
-        console.log(data + " - " + data.length);
         if(data === null || data.length === 0) {
             return res.status(404).json({"message" : "No Transactions added"});
         } else {
@@ -27,9 +26,9 @@ router.get('/', async (req, res) => {
                 .then((response => {
                     responseList.push(response);
                     if(responseList.length == data.length){
-                        responseList.sort((a,b) => {
-                            return a.date - b.date;
-                        })
+                        // responseList.sort((a,b) => {
+                        //     return a.date - b.date;
+                        // })
                         res.json({
                             "data" : responseList,
                             "meta" : {
