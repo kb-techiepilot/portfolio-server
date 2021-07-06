@@ -45,6 +45,7 @@ router.get('/', async (req, res) => {
             .then((response => {
                 responseList.push(response);
                     if(responseList.length == data.length){
+                        responseList.sort((a, b) => (a.wishlist_id > b.wishlist_id) ? 1 : -1);
                         res.json({
                             "data" : responseList,
                             "meta" : {
@@ -130,32 +131,38 @@ router.post('/', async (req, res) => {
         }else {
             pool.query(
                 sql.wishlist.insert, [userObj.USER_ID, userObj.WORKSPACE_ID, symbol, details.priceInfo.lastPrice ],
-                async (err) => {
+                async (err, wishlist) => {
                     if(err){
                         throw err;
                     } else {
-                        const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
-                        var responseList= [];
-                        data.forEach((row, index) => {
-                            Promise.resolve(wishlistResponse.getAllWishlist(row))
-                            .then((response => {
-                                responseList.push(response);
-                                    if(responseList.length == data.length){
+                        // const data = await getAllWishlist(userObj.USER_ID, userObj.WORKSPACE_ID);
+                        // var responseList= [];
+                        // data.forEach((row, index) => {
+                        //     Promise.resolve(wishlistResponse.getAllWishlist(row))
+                        //     .then((response => {
+                        //         responseList.push(response);
+                        //             if(responseList.length == data.length){
 
 
-                                        responseList.sort(function(a,b){
-                                            return a.wishlist_id - b.wishlist_id;
-                                            }
-                                        );
-                                        res.json({
-                                            "data" : responseList,
-                                            "meta" : {
-                                                "count" : responseList.length
-                                            }
-                                        });
-                                    }
-                            }));
-                        })
+                        //                 responseList.sort(function(a,b){
+                        //                     return a.wishlist_id - b.wishlist_id;
+                        //                     }
+                        //                 );
+                        //                 res.json({
+                        //                     "data" : responseList,
+                        //                     "meta" : {
+                        //                         "count" : responseList.length
+                        //                     }
+                        //                 });
+                        //             }
+                        //     }));
+                        // })
+                        var wishlistResponseObj = {};
+                        Promise.resolve(wishlistResponse.getWishlist(wishlist.rows[0]))
+                        .then((response => {
+                            wishlistResponseObj.wishlist = response;
+                            res.json(wishlistResponseObj);
+                        }));
                     }
                 }
             );

@@ -1,6 +1,7 @@
 const pool = require("../../../db/db");
 const sql  = require("../../../config/sqlv2");
 
+const holdingsResponse = require("../../../response/holdings");
 async function addSoldEntry(userId, buyDate, soldDate, symbol, quantity, buyPrice, sellPrice) {
     try {
         const res = await pool.query(

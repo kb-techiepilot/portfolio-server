@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "csv-string": "^4.0.1",
     "debug": "~2.6.9",
+    "dom-parser": "^0.1.6",
     "express": "~4.16.1",
     "express-jwt": "^6.0.0",
     "helmet": "^4.6.0",
