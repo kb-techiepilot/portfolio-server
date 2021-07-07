@@ -9,7 +9,7 @@ async function getQuote(id) {
 
     var data = JSON.parse(doc.getElementById('responseDiv').innerHTML.trim());
     
-    return data.data;
+    return data.data[0];
 }
 
 exports.getQuote = getQuote

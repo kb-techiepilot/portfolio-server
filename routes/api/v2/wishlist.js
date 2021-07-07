@@ -28,6 +28,23 @@ async function getAllWishlist(userId, workspaceId){
     }
 }
 
+async function getWishlist(id, userId, workspaceId){
+
+    try {
+        const data = await pool.query(
+            (Number(id) > 0) ?
+            sql.wishlist.getById : sql.wishlist.getBySymbol,[id, userId, workspaceId]
+        );
+        if(data.rows.length === 0 ) {
+            return null
+        } else {
+            return data.rows[0];
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
+}
+
 //getting all wishlist
 router.get('/', async (req, res) => {
     const { workspace } = req.query;
@@ -80,36 +97,19 @@ router.get('/:id', async (req, res) => {
         holdingsResponse.quantity = holdings.QUANTITY;
         holdingsResponse.price = holdings.PRICE;
     }
-    pool.query(
-        (Number(id) > 0) ?
-        sql.wishlist.getById : sql.wishlist.getBySymbol,[id, userObj.USER_ID, userObj.WORKSPACE_ID],
-        (err, wishlist) => {
-            if(err) {
-                throw err;
-            }
-            if(wishlist.rows.length === 0) {
-                if(Number(id) > 0 ) {
-                    return res.status(404).json({"message" : "No wishlist added"});
-                } else {
-                    var row = {};
-                    row.SYMBOL = id;
-                    Promise.resolve(wishlistResponse.getWishlist(row))
-                    .then((response => {
-                        wishlistResponseObj.wishlist = response;
-                        wishlistResponseObj.holdings = holdingsResponse;
-                        res.json(wishlistResponseObj);
-                    }));
-                }
-            } else {
-                Promise.resolve(wishlistResponse.getWishlist(wishlist.rows[0]))
-                    .then((response => {
-                        wishlistResponseObj.wishlist = response;
-                        wishlistResponseObj.holdings = holdingsResponse;
-                        res.json(wishlistResponseObj);
-                    }));
-            }  
-        }
-    )
+
+
+    var wishlistRow = await getWishlist(id, userObj.USER_ID, userObj.WORKSPACE_ID);
+
+    if(wishlistRow == null && isNaN(Number(id))) {
+        wishlistRow = {};
+        wishlistRow.SYMBOL = id;
+    } 
+    
+    const response = await wishlistResponse.getWishlist(wishlistRow);
+    wishlistResponseObj.wishlist = response;
+    wishlistResponseObj.holdings=holdingsResponse;
+    res.json(wishlistResponseObj);
 });
 
 //adding wishlist

@@ -7,6 +7,8 @@ const sql  = require("../../../config/sqlv2");
 
 const user = require("./user");
 
+const nseUtil = require('./nseUtil');
+
 const nseIndia = new NseIndia()
 
 router.get('/', async (req, res) => {
@@ -31,13 +33,35 @@ router.get('/', async (req, res) => {
                 var dayChange = 0;
                 var tempArray = [];
                 var result = {};
+                //from nseindia npm
+                // summary.rows.forEach((row, index) => {
+                //     totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
+                //     Promise.resolve(nseIndia.getEquityDetails(row.SYMBOL))
+                //     .then(response => {
+                //         var currentPrice = response.priceInfo.lastPrice;
+                //         currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
+                //         dayChange = dayChange + ( row.QUANTITY * response.priceInfo.change);
+                //         tempArray.push(totalAmount);
+                //         if(summary.rows.length === tempArray.length){
+                //             result.total_amount = totalAmount.toFixed(0);
+                //             result.current_amount = currentAmount.toFixed(0);
+                //             result.difference = (currentAmount - totalAmount).toFixed(0);
+                //             result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
+                //             result.day_change = dayChange.toFixed(0);
+                //             result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
+                //             res.json(result);
+                //         }
+                //     });
+                // });
+
+                //from nseindia site
                 summary.rows.forEach((row, index) => {
                     totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
-                    Promise.resolve(nseIndia.getEquityDetails(row.SYMBOL))
+                    Promise.resolve(nseUtil.getQuote(row.SYMBOL))
                     .then(response => {
-                        var currentPrice = response.priceInfo.lastPrice;
+                        var currentPrice = parseFloat(response.lastPrice.replace(/,/g, ''));
                         currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
-                        dayChange = dayChange + ( row.QUANTITY * response.priceInfo.change);
+                        dayChange = dayChange + ( row.QUANTITY * parseFloat(response.change));
                         tempArray.push(totalAmount);
                         if(summary.rows.length === tempArray.length){
                             result.total_amount = totalAmount.toFixed(0);
