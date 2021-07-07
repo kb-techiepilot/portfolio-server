@@ -1,5 +1,6 @@
 const { NseIndia } = require("stock-nse-india");
 const fetch = require("node-fetch");
+const nseUtil = require('../routes/api/v2/nseUtil')
 
 const nseIndia = new NseIndia()
 
@@ -12,7 +13,9 @@ async function getAllWishlist(row) {
 
     try {
         const details = await nseIndia.getEquityDetails(symbol);
+
         
+        //using nseindia package
         response.company_name = details.info.companyName;
         response.industry = details.metadata.industry;
         response.index = details.metadata.pdSectorInd;
@@ -21,6 +24,17 @@ async function getAllWishlist(row) {
         response.current_price = details.priceInfo.lastPrice;
         response.year_high = details.priceInfo.weekHighLow.max;
         response.year_low = details.priceInfo.weekHighLow.min;
+        
+        // const nsedetail = await nseUtil.getQuote(symbol);
+        
+        //geting data from nseindia site
+        // response.company_name = nsedetail.companyName;
+        // response.change = nsedetail.change;
+        // response.percent_change = nsedetail.pChange;
+        // response.current_price = nsedetail.lastPrice;
+        // response.year_high = nsedetail.high52;
+        // response.year_low = nsedetail.low52;
+        
     } catch(err){
         console.log(err);
         throw err;

@@ -45,7 +45,11 @@ app.use(
 app.use(bodyParser.json());
 
 app.use(helmet());
-app.use(cors({ origin: "*" }));
+app.use(cors({ 
+  "origin": "*",
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+ }));
 
 // // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
