@@ -1,11 +1,12 @@
 const fetch = require("node-fetch");
+const axios = require("axios");
 
 const pool = require("../../../db/db");
 const sql  = require("../../../config/sqlv2");
 
 async function getUserFromAuth0(token) {
     try {
-        const response = await fetch(
+        const response = await axios.get(
           `https://dev-604foaig.us.auth0.com/userinfo`,
           {
             headers: {
@@ -13,13 +14,24 @@ async function getUserFromAuth0(token) {
             },
           }
         );
-        
-        let responseData = await response.json();
-        return responseData;
+        return response.data;
       } catch(error) {
         return (error.message);
       }
 };
+
+async function getUserProfile(sub) {
+  try {
+    var user = await pool.query(
+      sql.users.getProfile, [sub]
+    );
+    if(user.rows.length > 0) {
+      return user.rows;
+    }
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
 
 async function getUserFromDb(sub, token) {
     try {
@@ -38,6 +50,9 @@ async function getUserFromDb(sub, token) {
             );
             await pool.query(
                 sql.workspace.insertForWishlist, [user.rows[0].USER_ID]
+            );
+            await pool.query(
+                sql.broker.insert, [user.rows[0].USER_ID, 'broker_1', '']
             );
             return user.rows[0];
         } catch (err) {
@@ -69,16 +84,7 @@ async function getUserFromDb(sub, token) {
       }
     }
 
-async function getUserProfile(sub, token) {
-    const dbUser = await getUserFromAuth0(sub);
-    const apiUser = await getUserFromAuth0(token);
-
-    apiUser.created_on = dbUser.CREATED_ON;
-    apiUser.user_id = dbUser.USER_ID;
-
-    return apiUser;
-}
-
   exports.getUserFromDb = getUserFromDb;
   exports.getUserProfile = getUserProfile;
   exports.getUserWithWorkspace = getUserWithWorkspace;
+  exports.getUserFromAuth0 = getUserFromAuth0;

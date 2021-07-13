@@ -29,6 +29,7 @@ async function getHoldings(row) {
 
 
     response.holdings_id = Number(row.HOLDINGS_ID);
+    response.broker_id = Number(row.BROKER_ID);
     response.symbol = symbol;
     response.quantity = quantity,
     response.price = price,

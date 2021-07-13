@@ -25,6 +25,8 @@ const soldV2 = require("./routes/api/v2/sold");
 const summaryV2 = require("./routes/api/v2/summary");
 const historyV2 = require("./routes/api/v2/history");
 const indexesV2 = require("./routes/api/v2/indexDetails");
+const profileV2 = require("./routes/api/v2/profile");
+const brokerV2 = require("./routes/api/v2/broker");
 
 const nse = require("./routes/api/v2/nse");
 
@@ -74,7 +76,8 @@ app.use("/", indexRoute);
 app.use("/api/v1/wishlist", checkJwt, wishlist);
 app.use("/api/v1/holdings", checkJwt, holdings);
 app.use("/api/v1/summary", checkJwt, summary);
-app.use("/api/v1/history", history);
+app.use("/api/v1/history", checkJwt, history);
+
 app.use("/api/v1/symbols", symbols);
 app.use("/api/v1/news", news);
 
@@ -83,14 +86,18 @@ app.use("/api/v2/wishlist", checkJwt, wishlistV2);
 app.use("/api/v2/holdings", checkJwt, holdingsV2);
 app.use("/api/v2/transactions", checkJwt, transactionsV2);
 app.use("/api/v2/sold", checkJwt, soldV2);
-app.use("/api/v2/history", historyV2);
+app.use("/api/v2/history", checkJwt, historyV2);
+app.use("/api/v2/summary", checkJwt, summaryV2);
+app.use("/api/v2/profile", checkJwt, profileV2);
+app.use("/api/v2/broker", checkJwt, brokerV2);
+
 app.use("/api/v2/symbols", symbols);
 app.use("/api/v2/news", news);
 
-app.use("/api/v2/summary", checkJwt, summaryV2);
 app.use("/api/v2/indexes", indexesV2);
 
 app.use("/api/v2/nse", nse);
+
 
 
 // error handler

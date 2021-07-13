@@ -69,9 +69,31 @@ async function addTransactions(userId, type, date, symbol, quantity, price) {
       }
 }
 
+async function getValidBrokerId(userId, brokerId) {
+    try{
+        const response = await pool.query(
+            sql.broker.select, [userId]
+        );
+
+        if(response.rowCount > 0) {
+            if(brokerId !== undefined){
+                for(var i = 0; i < response.rowCount; i++){
+                    if(brokerId === response.rows[i].BROKER_ID){
+                        return brokerId;
+                    }
+                }
+            }
+            return response.rows[0].BROKER_ID;
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
+}
+
 exports.addSoldEntry = addSoldEntry;
 exports.getHoldings = getHoldings;
 exports.getWishlist = getWishlist;
 exports.deleteHoldings = deleteHoldings;
 exports.updateHoldings = updateHoldings;
 exports.addTransactions = addTransactions;
+exports.getValidBrokerId = getValidBrokerId;

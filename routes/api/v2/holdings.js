@@ -12,12 +12,45 @@ const holdingsResponse = require("../../../response/holdings");
 
 const nseIndia = new NseIndia()
 
-async function getAllHoldings(userId, workspaceId){
+async function getAllHoldings(userId, workspaceId, brokerId){
 
     try {
-        const data = await pool.query(
-            sql.holdings.getAll, [userId, workspaceId]
-        );
+        var data = null;
+        if(brokerId > 0){
+            data = await pool.query(
+                sql.holdings.getByBroker, [userId, workspaceId, brokerId]
+            );
+        } else {
+            data = await pool.query(
+                sql.holdings.getAll, [userId, workspaceId]
+            ); 
+        }
+
+        if(data.rows.length === 0 ) {
+            return null
+        } else {
+            return data.rows;
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
+}
+
+async function getHoldingsByBroker(id, userId, workspaceId, brokerId){
+
+    try {
+        var data = null;
+        if(brokerId === undefined){
+            data = await pool.query(
+                (Number(id) > 0) ?
+                sql.holdings.getById : sql.holdings.getBySymbol, [id, userId, workspaceId]
+            );
+        } else {
+            data = await pool.query(
+                sql.holdings.getBySymbolBroker, [id, userId, workspaceId, brokerId]
+            ); 
+        }
+
         if(data.rows.length === 0 ) {
             return null
         } else {
@@ -31,14 +64,16 @@ async function getAllHoldings(userId, workspaceId){
 //getting all holdings
 router.get('/', async (req, res) => {
     
-    const { workspace } = req.query;
+    var { workspace, broker_id } = req.query;
 
+    
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
     
     if(userObj === null) {
         return res.status(404).json({"message" : "Workspace not found"});
     }
-    const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
+    const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
+
     if(data === null || data === []) {
         return res.status(200).json({"message" : "No holdings added", "data": []});
     } else {
@@ -67,7 +102,7 @@ router.get('/', async (req, res) => {
 //getting single holdings
 router.get('/:id', async (req, res) => {
     
-    const { workspace } = req.query;
+    const { workspace, broker_id } = req.query;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
     
@@ -76,12 +111,26 @@ router.get('/:id', async (req, res) => {
     }
 
     let id = req.params.id;
-    var data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
-    if(data !== undefined) {
-        Promise.resolve(holdingsResponse.getHoldings(data))
+    var data = await getHoldingsByBroker(id, userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
+    if(data !== null) {
+        var responseList= [];
+        data.forEach((row, index) => {
+            Promise.resolve(holdingsResponse.getHoldings(row))
             .then((response => {
-                return res.json(response);
+                responseList.push(response);
+                if(responseList.length == data.length){
+                    responseList.sort((a,b) => {
+                        return a.holdings_id - b.holdings_id;
+                    })
+                    return res.json({
+                        "data" : responseList,
+                        "meta" : {
+                            "count" : responseList.length
+                        }
+                    });
+                }
             }));
+        })
     } else if(isNaN(id)) {
         data = {};
         data.SYMBOL = id;
@@ -98,7 +147,7 @@ router.get('/:id', async (req, res) => {
 //adding holdings
 router.post('/', async (req, res) => {
     
-    const { workspace, date, symbol, quantity, price  } = req.body;
+    var { workspace, date, symbol, quantity, price, broker_id } = req.body;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
     
@@ -106,18 +155,19 @@ router.post('/', async (req, res) => {
         return res.status(404).json({"message" : "Workspace not found"});
     }
 
+    broker_id = await util.getValidBrokerId(userObj.USER_ID, broker_id);
     const details = await nseIndia.getEquityDetails(symbol);
     
     if(details.msg === "no data found") {
         return res.status(404).json({"message" : "Enter valid symbol"});
     } else {
-        const data = await util.getHoldings(symbol, userObj.USER_ID, userObj.WORKSPACE_ID);
-        if(data !== undefined) {
+        const data = await getHoldingsByBroker(symbol, userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
+        if(data !== null) {
             return res.status(400).json({"message" : "Stock already added to the holdings"});
         }else {
             pool.query(
                 sql.holdings.insert, [ userObj.USER_ID, userObj.WORKSPACE_ID, new Date(date).getTime() / 1000
-                , symbol, quantity, price, details.metadata.industry, details.metadata.pdSectorInd ],
+                , symbol, quantity, price, details.metadata.industry, details.metadata.pdSectorInd, broker_id ],
                 async (err, holdings) => {
                     if(err){
                         throw err;
@@ -127,7 +177,7 @@ router.post('/', async (req, res) => {
                         } catch(err) {
                             return res.status(500).json({"message" : "Exception on adding holdings : " + msg})
                         }
-                        const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
+                        const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
                         var responseList= [];
                         data.forEach((row, index) => {
                             Promise.resolve(holdingsResponse.getHoldings(row))
@@ -180,7 +230,7 @@ router.delete('/:id', async (req, res) => {
                         throw err;
                     } else {
                         // res.status(200).json({"message" : "holdings deleted"});
-                        const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
+                        const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
                         if(data === null || data === []) {
                             return res.status(404).json({"message" : "All holdings deleted"});
                         } else {
@@ -215,7 +265,7 @@ router.post('/:id', async (req, res) => {
     
     let id = req.params.id;    
     
-    var { workspace, date, symbol, quantity, price, average } = req.body;
+    var { workspace, date, quantity, price, average, broker_id } = req.body;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, workspace, 'holdings', req.headers.authorization);
 
@@ -250,7 +300,7 @@ router.post('/:id', async (req, res) => {
                     // throw err;
                 } else {
                     // res.status(200).json(holdings.rows[0]);
-                    const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID);
+                    const data = await getAllHoldings(userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
                     var responseList= [];
                     data.forEach((row, index) => {
                         Promise.resolve(holdingsResponse.getHoldings(row))
