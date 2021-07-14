@@ -6,6 +6,8 @@ async function getTransactions(row) {
     var response = {};
 
     response.transaction_id = row.TRANSACTION_ID;
+    response.broker_id = row.BROKER_ID;
+    response.broker_name = row.BROKER_NAME;
     response.type = row.TYPE;
     response.date = row.DATE;
     response.symbol = row.SYMBOL

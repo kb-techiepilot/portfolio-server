@@ -11,72 +11,92 @@ const nseUtil = require('./nseUtil');
 
 const nseIndia = new NseIndia()
 
+async function getSummary(userId, brokerId){
+    try {
+        var data = null;
+        if(brokerId > 0){
+            data = await pool.query(
+                sql.dashboard.getSummaryByBroker, [userId, brokerId]
+            );
+        } else {
+            data = await pool.query(
+                sql.dashboard.getSummary, [userId]
+            ); 
+        }
+
+        if(data.rows.length === 0 ) {
+            return null
+        } else {
+            return data.rows;
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
+}
+
 router.get('/', async (req, res) => {
     const userObj = await user.getUserFromDb(req.user.sub, req.headers.authorization);
 
-    pool.query(
-        sql.dashboard.getSummary, [userObj.USER_ID],
-        (err, summary) => {
-            if(err) {
-                throw err;
-            }
-            if(summary.rows.length === 0) {
-                var result = {}
-                result.total_amount = 0;
-                result.current_amount = 0;
-                result.difference = 0;
-                result.percentage = 0;
-                return res.status(200).json(result);
-            } else {
-                var totalAmount = 0;
-                var currentAmount = 0;
-                var dayChange = 0;
-                var tempArray = [];
-                var result = {};
-                //from nseindia npm
-                // summary.rows.forEach((row, index) => {
-                //     totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
-                //     Promise.resolve(nseIndia.getEquityDetails(row.SYMBOL))
-                //     .then(response => {
-                //         var currentPrice = response.priceInfo.lastPrice;
-                //         currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
-                //         dayChange = dayChange + ( row.QUANTITY * response.priceInfo.change);
-                //         tempArray.push(totalAmount);
-                //         if(summary.rows.length === tempArray.length){
-                //             result.total_amount = totalAmount.toFixed(0);
-                //             result.current_amount = currentAmount.toFixed(0);
-                //             result.difference = (currentAmount - totalAmount).toFixed(0);
-                //             result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
-                //             result.day_change = dayChange.toFixed(0);
-                //             result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
-                //             res.json(result);
-                //         }
-                //     });
-                // });
+    const brokerId = req.query.broker_id;
 
-                //from nseindia site
-                summary.rows.forEach((row, index) => {
-                    totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
-                    Promise.resolve(nseUtil.getQuote(row.SYMBOL))
-                    .then(response => {
-                        var currentPrice = parseFloat(response.lastPrice.replace(/,/g, ''));
-                        currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
-                        dayChange = dayChange + ( row.QUANTITY * parseFloat(response.change));
-                        tempArray.push(totalAmount);
-                        if(summary.rows.length === tempArray.length){
-                            result.total_amount = totalAmount.toFixed(0);
-                            result.current_amount = currentAmount.toFixed(0);
-                            result.difference = (currentAmount - totalAmount).toFixed(0);
-                            result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
-                            result.day_change = dayChange.toFixed(0);
-                            result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
-                            res.json(result);
-                        }
-                    });
-                });
-            }
-        }
-    )
+    const summary = await getSummary(userObj.USER_ID, brokerId);
+    if(summary === null) {
+        var result = {}
+        result.total_amount = 0;
+        result.current_amount = 0;
+        result.difference = 0;
+        result.percentage = 0;
+        result.day_change = 0;
+        result.day_prechent = 0;
+        return res.status(200).json(result);
+    } else {
+        var totalAmount = 0;
+        var currentAmount = 0;
+        var dayChange = 0;
+        var tempArray = [];
+        var result = {};
+        //from nseindia npm
+        // summary.rows.forEach((row, index) => {
+        //     totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
+        //     Promise.resolve(nseIndia.getEquityDetails(row.SYMBOL))
+        //     .then(response => {
+        //         var currentPrice = response.priceInfo.lastPrice;
+        //         currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
+        //         dayChange = dayChange + ( row.QUANTITY * response.priceInfo.change);
+        //         tempArray.push(totalAmount);
+        //         if(summary.rows.length === tempArray.length){
+        //             result.total_amount = totalAmount.toFixed(0);
+        //             result.current_amount = currentAmount.toFixed(0);
+        //             result.difference = (currentAmount - totalAmount).toFixed(0);
+        //             result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
+        //             result.day_change = dayChange.toFixed(0);
+        //             result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
+        //             res.json(result);
+        //         }
+        //     });
+        // });
+
+        //from nseindia site
+        summary.forEach((row, index) => {
+            totalAmount = totalAmount + (row.QUANTITY * row.PRICE);
+            Promise.resolve(nseUtil.getQuote(row.SYMBOL))
+            .then(response => {
+                var currentPrice = parseFloat(response.lastPrice.replace(/,/g, ''));
+                currentAmount = currentAmount + ( row.QUANTITY * currentPrice );
+                dayChange = dayChange + ( row.QUANTITY * parseFloat(response.change));
+                tempArray.push(totalAmount);
+                if(summary.length === tempArray.length){
+                    result.total_amount = totalAmount.toFixed(0);
+                    result.current_amount = currentAmount.toFixed(0);
+                    result.difference = (currentAmount - totalAmount).toFixed(0);
+                    result.percentage = (((currentAmount - totalAmount) / totalAmount) * 100).toFixed(2);
+                    result.day_change = dayChange.toFixed(0);
+                    result.day_prechent = ((dayChange / totalAmount) * 100).toFixed(2);
+                    return res.json(result);
+                }
+            });
+        });
+    }
 });
 
 router.get('/chart', async (req, res) => {

@@ -112,6 +112,7 @@ router.get('/:id', async (req, res) => {
 
     let id = req.params.id;
     var data = await getHoldingsByBroker(id, userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
+    console.log(data);
     if(data !== null) {
         var responseList= [];
         data.forEach((row, index) => {
@@ -134,9 +135,17 @@ router.get('/:id', async (req, res) => {
     } else if(isNaN(id)) {
         data = {};
         data.SYMBOL = id;
+        var responseList= [];
         Promise.resolve(holdingsResponse.getHoldings(data))
             .then((response => {
-                return res.json(response);
+                responseList.push(response);
+
+                return res.json({
+                    "data" : responseList,
+                    "meta" : {
+                        "count" : responseList.length
+                    }
+                });
             }));
     }
     else {
@@ -173,7 +182,7 @@ router.post('/', async (req, res) => {
                         throw err;
                     } else {
                         try{
-                            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, symbol, quantity, price);
+                            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, symbol, quantity, price, broker_id);
                         } catch(err) {
                             return res.status(500).json({"message" : "Exception on adding holdings : " + msg})
                         }
@@ -273,6 +282,7 @@ router.post('/:id', async (req, res) => {
         return res.status(404).json({"message" : "Workspace not found"});
     }
 
+    broker_id = await util.getValidBrokerId(userObj.USER_ID, broker_id);
     const data = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
     if(data === undefined) {
         return res.status(404).json({"message" : "Stock not added"});
@@ -289,7 +299,7 @@ router.post('/:id', async (req, res) => {
             newQuantity = Number(quantity) + Number(oldQuantity);
             newPrice = (oldAmount + newAmount)/newQuantity;
 
-            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, data.SYMBOL, quantity, price);
+            await util.addTransactions(userObj.USER_ID, 'Buy', new Date(date).getTime() / 1000, data.SYMBOL, quantity, price, broker_id);
         } 
         //need to update the transaction table also
         pool.query(

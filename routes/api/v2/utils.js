@@ -2,10 +2,10 @@ const pool = require("../../../db/db");
 const sql  = require("../../../config/sqlv2");
 
 const holdingsResponse = require("../../../response/holdings");
-async function addSoldEntry(userId, buyDate, soldDate, symbol, quantity, buyPrice, sellPrice) {
+async function addSoldEntry(userId, buyDate, soldDate, symbol, quantity, buyPrice, sellPrice, brokerId) {
     try {
         const res = await pool.query(
-            sql.sold.insert, [ userId, buyDate, soldDate, symbol, quantity, buyPrice, sellPrice ]
+            sql.sold.insert, [ userId, buyDate, soldDate, symbol, quantity, buyPrice, sellPrice, brokerId ]
         );
         return res.rows[0];
       } catch (err) {
@@ -58,10 +58,10 @@ async function updateHoldings(quantity, holdingsId) {
 }
 
 
-async function addTransactions(userId, type, date, symbol, quantity, price) {
+async function addTransactions(userId, type, date, symbol, quantity, price, brokerId) {
     try {
         const res = await pool.query(
-            sql.transaction.insert, [ userId, type, date, symbol, quantity, price, (quantity * price)]
+            sql.transaction.insert, [ userId, type, date, symbol, quantity, price, (quantity * price), brokerId]
         );
         return res.rows[0];
       } catch (err) {

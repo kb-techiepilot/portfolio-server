@@ -54,10 +54,11 @@ router.post('/:id', async (req, res) => {
 
     let id = req.params.id;
 
-    var { partial, price, quantity, solddate } = req.body;
+    var { partial, price, quantity, solddate, broker_id } = req.body;
 
     const userObj = await user.getUserWithWorkspace(req.user.sub, 'default', 'holdings', req.headers.authorization);
-
+    
+    broker_id = await util.getValidBrokerId(userObj.USER_ID, broker_id);
     const holdingsData = await util.getHoldings(id, userObj.USER_ID, userObj.WORKSPACE_ID);
     if(holdingsData !== undefined) {
         if(holdingsData.QUANTITY < Number(quantity) ) {
@@ -75,9 +76,9 @@ router.post('/:id', async (req, res) => {
         }
 
         try{
-            const response = await util.addSoldEntry(userObj.USER_ID, new Date(holdingsData.DATE).getTime() / 1000, new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, holdingsData.PRICE, price);
+            const response = await util.addSoldEntry(userObj.USER_ID, new Date(holdingsData.DATE).getTime() / 1000, new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, holdingsData.PRICE, price, broker_id);
             try{
-                await util.addTransactions(userObj.USER_ID, 'Sell', new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, price);
+                await util.addTransactions(userObj.USER_ID, 'Sell', new Date(solddate).getTime() / 1000, holdingsData.SYMBOL, quantity, price, broker_id);
             } catch(err) {
                 res.status(404).json({"message" : "Exception on selling holdings : " + err})
             }
