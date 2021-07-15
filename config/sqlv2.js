@@ -49,6 +49,7 @@ module.exports = {
 
     transaction: {
         getAll              : `SELECT "TRANSACTION_ID", transactions."BROKER_ID", "NAME" AS "BROKER_NAME", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions JOIN broker on transactions."BROKER_ID" = broker."BROKER_ID" WHERE transactions."USER_ID" = $1 ORDER BY "TRANSACTION_ID" DESC`,
+        getAllByBroker      : `SELECT "TRANSACTION_ID", transactions."BROKER_ID", "NAME" AS "BROKER_NAME", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions JOIN broker on transactions."BROKER_ID" = broker."BROKER_ID" WHERE transactions."USER_ID" = $1 AND transactions."BROKER_ID" = $2 ORDER BY "TRANSACTION_ID" DESC`,
         getTop              : `SELECT "TRANSACTION_ID", transactions."BROKER_ID", "NAME" AS "BROKER_NAME", "TYPE", TO_TIMESTAMP("DATE")::date AS "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT" FROM transactions JOIN broker on transactions."BROKER_ID" = broker."BROKER_ID" WHERE transactions."USER_ID" = $1 ORDER BY "TRANSACTION_ID" DESC LIMIT 10`,
         getAllCount         : `SELECT COUNT(*) FROM transactions WHERE "USER_ID" = $1`,
         insert              : `INSERT INTO transactions ("USER_ID", "BROKER_ID", "TYPE", "DATE", "SYMBOL", "EXCHANGE", "QUANTITY", "PRICE", "AMOUNT") VALUES ($1, $8, $2, $3, $4, 'NSE', $5, $6, $7) RETURNING "TRANSACTION_ID"`,

@@ -179,10 +179,8 @@ router.post('/bulk', async (req, res) => {
     if(userObj === null) {
         return res.status(200).json({"message" : "Workspace not found"});
     }
-    console.log(symbols + " " + typeof(symbols));
     const symbolArray = JSON.parse(symbols);
     symbolArray.forEach(async (symbol) => {
-        console.log("symbol : " + symbol);
         const details = await nseIndia.getEquityDetails(symbol)
         if(details.msg === "no data found") {
             // res.status(200).json({"message" : "Enter valid symbol"});

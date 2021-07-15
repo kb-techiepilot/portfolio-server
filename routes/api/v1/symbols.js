@@ -42,7 +42,6 @@ router.get('/current', async (req, res) => {
 router.get('/data', async (req, res) => {
     const url = ApiList[req.query.symbol];
     const response = await nseIndia.getEquityCorporateInfo("SBIN");
-    console.log(response);
     res.json(response);
 });
 

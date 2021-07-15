@@ -112,7 +112,6 @@ router.get('/:id', async (req, res) => {
 
     let id = req.params.id;
     var data = await getHoldingsByBroker(id, userObj.USER_ID, userObj.WORKSPACE_ID, broker_id);
-    console.log(data);
     if(data !== null) {
         var responseList= [];
         data.forEach((row, index) => {
