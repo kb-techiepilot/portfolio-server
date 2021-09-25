@@ -16,11 +16,11 @@ router.get("/", async (req, res) => {
     },
       })
         .then(function (response) {
-          console.log(response);
+          // console.log(response);
           res.json(response.data);
         })
         .catch(function (response) {
-          console.log(response);
+          // console.log(response);
           res.json(response);
         });
 });
