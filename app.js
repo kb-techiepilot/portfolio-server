@@ -30,6 +30,8 @@ const brokerV2 = require("./routes/api/v2/broker");
 
 const nse = require("./routes/api/v2/nse");
 
+const scan = require("./routes/api/v2/scan");
+
 var app = express();
 
 // view engine setup
@@ -97,6 +99,8 @@ app.use("/api/v2/news", news);
 app.use("/api/v2/indexes", indexesV2);
 
 app.use("/api/v2/nse", nse);
+
+app.use("/api/v2/scan", scan);
 
 
 
