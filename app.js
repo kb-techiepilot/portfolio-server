@@ -32,6 +32,8 @@ const nse = require("./routes/api/v2/nse");
 
 const scan = require("./routes/api/v2/scan");
 
+const tvalert = require("./routes/api/v2/tvalert");
+
 var app = express();
 
 // view engine setup
@@ -101,6 +103,8 @@ app.use("/api/v2/indexes", indexesV2);
 app.use("/api/v2/nse", nse);
 
 app.use("/api/v2/scan", scan);
+
+app.use("/api/v2/tvalert", tvalert);
 
 
 
